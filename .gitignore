@@ -1,0 +1,18 @@
+# local secrets — never commit
+FIGMA-CREDs
+
+# command code local config
+.commandcode/
+
+# node
+node_modules/
+dist/
+build/
+coverage/
+
+# env
+.env
+.env.*
+
+# OS
+.DS_Store
