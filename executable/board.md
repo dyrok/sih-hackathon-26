@@ -59,8 +59,8 @@
 | ML-002 | Validation harness: backtest rules engine on synthetic data | kv | QA-001, BACK-004 | 2026-09-16 | [x] |
 | ML-003 | Fairness audit checklist + SHAP report template | kv | ML-001 | 2026-09-17 | [x] |
 | ML-004 | ML v2 data-collection plan from counsellor labels | kv | ML-002 | 2026-09-25 | [x] |
-| ML-005 | Verify every link + citation in datasets-research.md; list dead links for neel | ayush | DOCS-006 | 2026-09-10 | [ ] |
-| ML-006 | One-page instrument factsheet (PHQ-9/GAD-7/PSS-10/ISI: items, bands, source) for the deck | ayush | DOCS-006 | 2026-09-11 | [ ] |
+| ML-005 | Verify every link + citation in datasets-research.md; list dead links for neel | ayush | DOCS-006 | 2026-09-10 | [x] |
+| ML-006 | One-page instrument factsheet (PHQ-9/GAD-7/PSS-10/ISI: items, bands, source) for the deck | ayush | DOCS-006 | 2026-09-11 | [x] |
 | PRIV-001 | DPDP 2023 mapping audit vs implementation | kv | DOCS-005 | 2026-09-13 | [x] |
 | PRIV-002 | RBAC enforcement tests | neel | BACK-001 | 2026-09-14 | [ ] |
 | PRIV-003 | Security test cases + threat model walkthrough | neel | DOCS-005 | 2026-09-15 | [ ] |
@@ -75,8 +75,8 @@
 | QA-003 | E2E test execution + coverage report | neel | QA-002 | 2026-09-16 | [ ] |
 | QA-004 | Demo rehearsal checklist + recorded video fallback | kv | QA-003 | 2026-09-17 | [x] |
 | QA-005 | Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv | tejas | — | 2026-09-09 | [~] |
-| QA-006 | Run the manual test checklist from docs/quality/test-plan.md (guided by neel); record pass/fail per case | tejas | QA-003 | 2026-09-17 | [ ] |
-| QA-007 | Demo rehearsal support + record the fallback video with risa | tejas | QA-004 | 2026-09-18 | [ ] |
+| QA-006 | Run the manual test checklist from docs/quality/test-plan.md (guided by neel); record pass/fail per case | tejas | QA-003 | 2026-09-17 | [~] |
+| QA-007 | Demo rehearsal support + record the fallback video with risa | tejas | QA-004 | 2026-09-18 | [~] |
 | DECK-001 | Build the deck inside the official SIH template following docs/deck/ppt-guide.md | risa | DOCS-014, DECK-003 | 2026-09-17 | [ ] |
 | DECK-002 | Demo video (with tejas) | risa | QA-007 | 2026-09-18 | [ ] |
 | DECK-003 | Impact/scalability slide figures with citations (source: impact-and-metrics.md) | risa | DOCS-007 | 2026-09-17 | [ ] |
