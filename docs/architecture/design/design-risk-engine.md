@@ -1,6 +1,6 @@
 # Design — Risk Rules Engine (F04)
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] implemented · Last updated: 2026-09-08
 > Implements [F04](../../features/F04-risk-rules-engine.md) · Stack per [ADR-0006](../decisions/0006-tech-stack.md): pure-Python rules v1; scikit-learn/lightgbm + SHAP reserved for v2 · Related: [design-hr-signal-engine.md](design-hr-signal-engine.md) (input side)
 
 ## 1. Module breakdown (`backend/app/risk/`)

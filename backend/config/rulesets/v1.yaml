@@ -1,0 +1,112 @@
+version: 1
+# Demo-cfg thresholds — clinical review pending. Not validated statistics.
+# Trace: docs/features/F04-risk-rules-engine.md · docs/explanation/model-explainer.md
+tiers:
+  green: [0, 39]
+  amber: [40, 59]
+  red: [60, 79]
+  critical: [80, 100]
+domains:
+  duty: {cap: 18}
+  leave: {cap: 14}
+  deploy: {cap: 12}
+  career: {cap: 8}
+  health: {cap: 10}
+  psych: {cap: 16}
+freshness:
+  max_age_days: 7
+hysteresis:
+  downgrade_confirmations: 2
+baseline:
+  window_days: 60
+  min_history_days: 14
+  sleep_deviation: -0.30
+masking:
+  tier_floor: red
+  extra_weight: 10
+  conditions: [self_report_fine, validity_fail, straight_lining, too_fast, all_max]
+  adverse:
+    consecutive_duty_days: 60
+    leave_cancel_count: 2
+    sleep_hours: 4.5
+    sleep_deviation: -0.30
+crisis:
+  phq9_item_9_min: 1
+rules:
+  - id: R-DUT-01
+    domain: duty
+    weight: 12
+    inputs: [consecutive_duty_days]
+    op: ">="
+    threshold: 60
+    explain_key: risk.factor.duty_streak
+  - id: R-DUT-02
+    domain: duty
+    weight: 8
+    inputs: [circadian_disruption_score]
+    op: ">="
+    threshold: 0.6
+    explain_key: risk.factor.circadian
+  - id: R-LVE-01
+    domain: leave
+    weight: 8
+    inputs: [days_since_home_leave]
+    op: ">="
+    threshold: 180
+    explain_key: risk.factor.home_leave
+  - id: R-LVE-02
+    domain: leave
+    weight: 6
+    inputs: [leave_cancel_count]
+    op: ">="
+    threshold: 2
+    explain_key: risk.factor.leave_cancellations
+  - id: R-LVE-03
+    domain: leave
+    weight: 4
+    inputs: [early_return_days]
+    op: ">="
+    threshold: 3
+    explain_key: risk.factor.early_return
+  - id: R-DEP-01
+    domain: deploy
+    weight: 8
+    inputs: [family_separation_index]
+    op: ">="
+    threshold: 4000
+    explain_key: risk.factor.family_separation
+  - id: R-DEP-02
+    domain: deploy
+    weight: 6
+    inputs: [days_in_high_risk_posting]
+    op: ">="
+    threshold: 30
+    explain_key: risk.factor.high_risk_posting
+  - id: R-CAR-01
+    domain: career
+    weight: 5
+    inputs: [inquiry_court_pending]
+    op: ">="
+    threshold: 1
+    explain_key: risk.factor.inquiry
+  - id: R-CAR-02
+    domain: career
+    weight: 4
+    inputs: [transfer_count_12m]
+    op: ">="
+    threshold: 2
+    explain_key: risk.factor.transfers
+  - id: R-HEA-01
+    domain: health
+    weight: 10
+    inputs: [sleep_deviation]
+    op: "<="
+    threshold: -0.30
+    explain_key: risk.factor.sleep_deviation
+  - id: R-PSY-01
+    domain: psych
+    weight: 15
+    inputs: [phq9]
+    op: ">="
+    threshold: 10
+    explain_key: risk.factor.phq9

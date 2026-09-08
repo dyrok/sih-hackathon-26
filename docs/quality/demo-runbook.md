@@ -1,6 +1,6 @@
 # Demo Runbook — SAARTHI
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] current (QA-004 rehearsal checklist) · Last updated: 2026-09-08
 
 > **Doctrine: never demo an empty dashboard.** Every screen shows seeded, realistic Indian data (names, 3rd Bn, rosters, leave patterns) from [F09](../features/F09-synthetic-data-generator.md). The demo must survive offline: recorded video fallback on pen drive + two devices, local-run build, hotspot backup. 3-minute script, rehearsed 5× before any jury sees it.
 
@@ -86,3 +86,40 @@ Every answer anchors to a written doc — answer in one sentence, then point to 
 | "Who pays after the hackathon?" | The sponsoring org — CRPF/MHA pilot; adoption rides the existing roster app (ADR-0004). | research §5, §7 |
 
 Rule: if the honest answer is "we haven't measured that", say so and log it — an honest gap beats an invented number ([AGENTS.md](../../AGENTS.md) rule 6).
+
+## 7. QA-004 — rehearsal checklist (kv) + recorded-video fallback
+
+The **video file itself** is recorded with risa/tejas (DECK-002 / QA-007). This section is the kv-owned checklist those recordings must satisfy, and the fallback protocol if the live demo dies.
+
+### Rehearsal gate (must all be true before any jury)
+
+- [ ] `cd backend && python -m app.seed` produces DEMO-PERSONA-01; `GET /risk/ps_demo01/explanation` as counsellor returns top-3 factors.
+- [ ] `pytest -q` green on the demo laptop, including `test_firewall.py` (ADR-0003 must-pass).
+- [ ] `python -m app.ml.harness` exits 0 (persona arc diffs empty).
+- [ ] Commander login `commander.3bn` / `saarthi` shows `/aggregates/unit/3BN` with no names.
+- [ ] Who-viewed on `jawan.demo` shows the counsellor read after a console open — the 15-second moment.
+- [ ] `docker compose up` (or `uvicorn` local) still serves after airplane mode on the laptop.
+- [ ] Five rows filled in §5 rehearsal log, last one on the actual projector.
+
+### Recorded-video fallback spec (what tejas records)
+
+| Shot | Duration | Must show | Must not show |
+|---|---|---|---|
+| 1. Jawan check-in (Hindi) | 10 s | 10-second check-in, `instr.not_diagnosis` visible | anyone else's data |
+| 2. Commander aggregate | 15 s | "3rd Bn" elevated fatigue, k ≥ 5, **no names** | any personnel_id, any score |
+| 3. Counsellor explanation | 20 s | top-3 factors read aloud | raw journal |
+| 4. Masking + Red SLA | 15 s | "I'm fine" vs duty/leave; outreach ≤ 24 h | disciplinary language |
+| 5. Dual-key + who-viewed | 20 s | two approvals; jawan phone receipt | the unmasked name on a commander screen |
+| 6. Roster swap + trend down | 10 s | proposal + load delta | a score on the commander view |
+
+Export: 1080p mp4, < 100 MB, **no internet required to play**. Copies: pen drive, emailed to kv + risa, second device. Filename: `SAARTHI-demo-fallback-YYYYMMDD.mp4`.
+
+If live demo fails: presenter says one sentence ("we'll play the recorded walkthrough") and hits play. Never debug on stage.
+
+### Blockers logged 2026-09-08
+
+- APP-001…010 (neel) — mobile/web UI not in this backend PR; API + seed are. Live app screens wait on neel.
+- DECK-001 (risa) — official-template deck not built.
+- QA-007 / DECK-002 — fallback video not yet recorded.
+
+Backend-only rehearsal (API + OpenAPI + seeded persona) **can** start now. Full 3-minute jury demo cannot be marked clean until the three blockers move.

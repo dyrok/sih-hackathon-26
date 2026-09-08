@@ -1,6 +1,6 @@
 # Checklist — kv
 
-> Auto-generated from [board.md](../board.md) on 2026-09-06 00:08
+> Auto-generated from [board.md](../board.md) on 2026-09-08 22:49
 > Edit status in board.md, not here.
 
 ## Phase 0 — Documentation brain (2026-09-05 → 09-08)
@@ -21,37 +21,37 @@
 - [x] **ML-001** · Signal feature definitions + clinical thresholds (absorbed into F04 + model-explainer) · due 2026-09-09 ← needs DOCS-006
 ## Phase 1 — Prototype v1 (2026-09-08 → 09-15)
 
-- [ ] **BACK-001** · FastAPI + Postgres scaffold, JWT auth, RBAC middleware · due 2026-09-10 ← needs DOCS-011
-- [ ] **BACK-002** · Immutable audit log + break-glass flow · due 2026-09-10 ← needs BACK-001
-- [ ] **BACK-003** · HR ingestion (CSV+API) + signal feature derivation · due 2026-09-12 ← needs BACK-001
-- [ ] **BACK-004** · Rules engine v1: per-person baselines + masking flag · due 2026-09-13 ← needs BACK-003
+- [~] **BACK-001** · FastAPI + Postgres scaffold, JWT auth, RBAC middleware · due 2026-09-10 ← needs DOCS-011
+- [~] **BACK-002** · Immutable audit log + break-glass flow · due 2026-09-10 ← needs BACK-001
+- [~] **BACK-003** · HR ingestion (CSV+API) + signal feature derivation · due 2026-09-12 ← needs BACK-001
+- [~] **BACK-004** · Rules engine v1: per-person baselines + masking flag · due 2026-09-13 ← needs BACK-003
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **PRIV-001** · DPDP 2023 mapping audit vs implementation · due 2026-09-13 ← needs DOCS-005
+- [~] **PRIV-001** · DPDP 2023 mapping audit vs implementation · due 2026-09-13 ← needs DOCS-005
 ## Phase 1 — Prototype v1 (2026-09-08 → 09-15)
 
-- [ ] **BACK-005** · Intervention engine: response ladder + capacity triage · due 2026-09-14 ← needs BACK-004
-- [ ] **BACK-007** · k-anonymity aggregation + dual-key unmask endpoints · due 2026-09-14 ← needs BACK-002
-- [ ] **BACK-009** · who-viewed-my-data logging API · due 2026-09-14 ← needs BACK-002
-- [ ] **BACK-006** · Workload rebalancing optimiser (greedy v1) · due 2026-09-15 ← needs BACK-005
-- [ ] **BACK-008** · Alert dispatch + Tele-MANAS handoff record · due 2026-09-15 ← needs BACK-005
+- [~] **BACK-005** · Intervention engine: response ladder + capacity triage · due 2026-09-14 ← needs BACK-004
+- [~] **BACK-007** · k-anonymity aggregation + dual-key unmask endpoints · due 2026-09-14 ← needs BACK-002
+- [~] **BACK-009** · who-viewed-my-data logging API · due 2026-09-14 ← needs BACK-002
+- [~] **BACK-006** · Workload rebalancing optimiser (greedy v1) · due 2026-09-15 ← needs BACK-005
+- [~] **BACK-008** · Alert dispatch + Tele-MANAS handoff record · due 2026-09-15 ← needs BACK-005
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **ML-002** · Validation harness: backtest rules engine on synthetic data · due 2026-09-16 ← needs QA-001, BACK-004
-- [ ] **PRIV-004** · MHCA 2017 section 23 compliance review · due 2026-09-16 ← needs DOCS-005
-- [ ] **ML-003** · Fairness audit checklist + SHAP report template · due 2026-09-17 ← needs ML-001
-- [ ] **QA-004** · Demo rehearsal checklist + recorded video fallback · due 2026-09-17 ← needs QA-003
+- [~] **ML-002** · Validation harness: backtest rules engine on synthetic data · due 2026-09-16 ← needs QA-001, BACK-004
+- [~] **PRIV-004** · MHCA 2017 section 23 compliance review · due 2026-09-16 ← needs DOCS-005
+- [~] **ML-003** · Fairness audit checklist + SHAP report template · due 2026-09-17 ← needs ML-001
+- [~] **QA-004** · Demo rehearsal checklist + recorded video fallback · due 2026-09-17 ← needs QA-003
 ## Phase 3 — Submission & hardening (2026-09-18 → ongoing)
 
-- [ ] **PM-002** · Internal round readiness check (deck+demo+repo) · due 2026-09-18 ← needs DECK-001, QA-004
-- [ ] **PM-003** · Portal submission package (PDF, title, description) · due 2026-09-19 ← needs PM-002
+- [~] **PM-002** · Internal round readiness check (deck+demo+repo) · due 2026-09-18 ← needs DECK-001, QA-004
+- [~] **PM-003** · Portal submission package (PDF, title, description) · due 2026-09-19 ← needs PM-002
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **ML-004** · ML v2 data-collection plan from counsellor labels · due 2026-09-25 ← needs ML-002
+- [~] **ML-004** · ML v2 data-collection plan from counsellor labels · due 2026-09-25 ← needs ML-002
 ## Phase 3 — Submission & hardening (2026-09-18 → ongoing)
 
-- [ ] **PM-004** · Mentor feedback incorporation board (Round 2 criteria) · due 2026-09-26 ← needs PM-003
-- [ ] **PM-005** · Finale 36h execution plan + 3-min demo script · due 2026-11-15 ← needs PM-004
+- [~] **PM-004** · Mentor feedback incorporation board (Round 2 criteria) · due 2026-09-26 ← needs PM-003
+- [~] **PM-005** · Finale 36h execution plan + 3-min demo script · due 2026-11-15 ← needs PM-004
 - [~] **PM-001** · Daily board sync + checklist regeneration · due daily
 
 ## Definition of done (every task)

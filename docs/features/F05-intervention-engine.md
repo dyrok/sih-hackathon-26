@@ -1,6 +1,6 @@
 # F05 — Intervention Engine
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] implemented in `backend/` (BACK-005/006/008) · Last updated: 2026-09-08
 > Maps to: FR-09, FR-10, FR-11, FR-13 in [prd.md](../product/prd.md) · [Architecture](../architecture/architecture.md)
 
 ## Purpose
@@ -123,14 +123,26 @@ Request sketch (`POST /roster/rebalance`): `{"unit_id": "3BN-C-D", "mode": "work
 - Any punitive workflow — none exists; a PR adding one is rejected (AGENTS rule 8).
 - Pay/compensation processing.
 
+## Implementation (BACK-005 / BACK-006 / BACK-008, 2026-09-08)
+
+| Piece | Path |
+|---|---|
+| Ladder + case dedupe + group cases | `backend/app/interventions/cases.py` · `ladder.py` |
+| Capacity-aware triage + weekly caps | `backend/app/interventions/triage.py` · `GET /interventions/queue` |
+| Greedy roster rebalance (workload / welfare_weighted) | `backend/app/interventions/rebalance.py` · `POST /roster/rebalance` |
+| Tele-MANAS record + outcome labels | `POST /interventions/{id}/telemanas` · `POST /interventions/{id}/outcome` |
+| Tests | `backend/tests/test_interventions.py` |
+
+Commander may GET/approve **workload-mode** proposals only. `welfare_weighted` is 403 to command.
+
 ## Definition of done
 
-- FR-09: all four rungs demonstrable; Red → contact ≤ 24 h enforced by SLA timer in the demo loop (architecture.md §6).
-- FR-10: caps enforced in tests; deferral queue re-ranks daily; group-case path proven on a mass-exposure fixture.
-- FR-11: greedy rebalance produces a valid roster on F09's synthetic 90-day data; diff + load delta shown; approval flow works.
-- FR-13: Tele-MANAS referral recorded end-to-end with outcome status.
-- `intervention_outcome` exports as documented ML v2 label rows.
-- Automated test: zero welfare fields reachable from any command-facing route.
+- [x] FR-09: four rungs in config; Red SLA = 24 h on the case; Critical SLA = immediate.
+- [x] FR-10: caps enforced; deferred rows stay visible with `cap_reason`; Critical preempts; group-case path on unit incident.
+- [x] FR-11: greedy rebalance returns a proposal (diff + load delta); approval flow; welfare_weighted hidden from command.
+- [x] FR-13: Tele-MANAS referral recorded; `clinical_content` is always null.
+- [x] `intervention_outcome` exports as ML v2 label rows (`label_exported=true`).
+- [x] Automated test: zero welfare fields on command-facing routes.
 
 ## Links
 

@@ -1,6 +1,6 @@
 # F01 — HR Signal Engine
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] implemented in `backend/` (BACK-003) · Last updated: 2026-09-08
 > Maps to: FR-01, FR-08 in [prd.md](../product/prd.md) · [Architecture](../architecture/architecture.md)
 
 ## Purpose
@@ -128,15 +128,27 @@ This gives 20 active signals + 3 gated — clears FR-01's "15+".
 - Any HRMS *write* (sanctioning leave, editing rosters) — SAARTHI reads, never writes.
 - ML over signals → v2 only (ADR-0001).
 
+## Implementation (BACK-003, 2026-09-08)
+
+| Piece | Path |
+|---|---|
+| CSV + JSON ingest, quarantine, idempotent batch | `backend/app/ingest/pipeline.py` · `POST /ingest/hr/csv` · `POST /ingest/hr/{dataset}` |
+| 20 active signals (pure functions, `as_of` injected) | `backend/app/signals/domain/*` · `calculator.py` |
+| Snapshot upsert + unit-scoped group flags | `backend/app/signals/snapshot.py` |
+| V1–V3 life events | gated **off** (`SAARTHI_LIFE_EVENTS_ENABLED`, default false) |
+| Tests | `backend/tests/test_signals.py` · `test_ingest.py` |
+
+F09's 1,000-person generator (QA-001, neel) is not in this PR. The backend seed (`python -m app.seed`, seed-equivalent DEMO-PERSONA-01) is the fixture ML-002 and the demo loop use until F09 lands. NFR-06 1,000-person < 60 s is re-measured when QA-001 ships.
+
 ## Definition of done
 
-- CSV + REST ingest for all six datasets; batch-idempotent; quarantine + report (FR-01).
-- All 20 active signals implemented, unit-tested against fixtures, formulas matching this doc.
-- Group trauma flag propagates to F04 for the exposed unit roster (FR-08 test case).
-- F09's 1,000-person × 90-day synthetic dataset ingests and recomputes < 60 s on modest hardware (NFR-06).
-- Demo persona's signal values match the scripted expectations (test-plan).
-- Zero individual-data routes reachable with commander role (automated route-level test).
-- Append-only audit on every read/write (NFR-08).
+- [x] CSV + REST ingest for all six datasets; batch-idempotent; quarantine + report (FR-01).
+- [x] All 20 active signals implemented, unit-tested against fixtures, formulas matching this doc.
+- [x] Group trauma flag is unit-scoped, never a named individual (FR-08 test case).
+- [ ] F09's 1,000-person × 90-day synthetic dataset ingests and recomputes < 60 s (blocked on QA-001).
+- [x] Demo persona's signal values drive the scripted arc (ML-002 harness).
+- [x] Zero individual-data routes reachable with commander role (automated route-level test).
+- [x] Append-only audit on every read/write (NFR-08).
 
 ## Links
 

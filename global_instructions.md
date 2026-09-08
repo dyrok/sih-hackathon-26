@@ -1,7 +1,7 @@
 # global_instructions.md — SAARTHI Global Operating Manual
 
 > **Read this FIRST** — every team member and every AI agent. [`AGENTS.md`](AGENTS.md) is the law; this file is the map: the master roadmap, the complete work progress checklist, and the global working instructions.
-> Owner: kv · Status: [~] live (kv updates §5 progress at each phase gate) · Last updated: 2026-09-05
+> Owner: kv · Status: [~] live (kv updates §5 progress at each phase gate) · Last updated: 2026-09-08
 
 ## 1. What we are building
 
@@ -46,12 +46,12 @@ git switch <your-name>            # your branch only, never main
 
 > Per-task live status: [board.md](executable/board.md). kv mirrors status into this checklist at each daily sync (PM-001) and ticks phase gates when the gate criteria are met. Legend: `[ ]` todo · `[~]` in-progress · `[x]` done.
 
-### Progress snapshot: 17 / 66 tasks complete (26%)
+### Progress snapshot: 17 / 66 tasks complete (26%) — kv backend on branch `kv` pending neel review
 
 | Phase | Window | Tasks | Done | Gate status |
 |---|---|---|---|---|
 | 0 — Docs brain | Sep 5–8 | 16 | 16 | [x] every doc has owner + stamp |
-| 1 — Prototype v1 | Sep 8–15 | 19 | 0 | [ ] full demo loop runs on synthetic data |
+| 1 — Prototype v1 | Sep 8–15 | 19 | 0 | [~] backend demo loop on branch `kv` (not merged) |
 | 2 — Theory, QA, demo package | Sep 9–19 | 26 | 1 | [ ] deck PDF + video + rehearsal done |
 | 3 — Submission & hardening | Sep 18 → | 5 | 0 | [ ] portal submission before 20 Sep |
 

@@ -1,6 +1,6 @@
 # Board — single status source
 
-> Owner: kv · Status: [~] live (updated daily) · Last updated: 2026-09-05
+> Owner: kv · Status: [~] live (updated daily) · Last updated: 2026-09-08
 >
 > Structure owned by kv (PM). Owners edit ONLY the Status column of their own rows.
 > Legend: `[ ]` todo · `[~]` in-progress · `[x]` done · `[!]` blocked (reason + who unblocks)
@@ -31,15 +31,15 @@
 
 | ID | Task | Owner | Depends on | Due | Status |
 |---|---|---|---|---|---|
-| BACK-001 | FastAPI + Postgres scaffold, JWT auth, RBAC middleware | kv | DOCS-011 | 2026-09-10 | [ ] |
-| BACK-002 | Immutable audit log + break-glass flow | kv | BACK-001 | 2026-09-10 | [ ] |
-| BACK-003 | HR ingestion (CSV+API) + signal feature derivation | kv | BACK-001 | 2026-09-12 | [ ] |
-| BACK-004 | Rules engine v1: per-person baselines + masking flag | kv | BACK-003 | 2026-09-13 | [ ] |
-| BACK-005 | Intervention engine: response ladder + capacity triage | kv | BACK-004 | 2026-09-14 | [ ] |
-| BACK-006 | Workload rebalancing optimiser (greedy v1) | kv | BACK-005 | 2026-09-15 | [ ] |
-| BACK-007 | k-anonymity aggregation + dual-key unmask endpoints | kv | BACK-002 | 2026-09-14 | [ ] |
-| BACK-008 | Alert dispatch + Tele-MANAS handoff record | kv | BACK-005 | 2026-09-15 | [ ] |
-| BACK-009 | who-viewed-my-data logging API | kv | BACK-002 | 2026-09-14 | [ ] |
+| BACK-001 | FastAPI + Postgres scaffold, JWT auth, RBAC middleware | kv | DOCS-011 | 2026-09-10 | [~] |
+| BACK-002 | Immutable audit log + break-glass flow | kv | BACK-001 | 2026-09-10 | [~] |
+| BACK-003 | HR ingestion (CSV+API) + signal feature derivation | kv | BACK-001 | 2026-09-12 | [~] |
+| BACK-004 | Rules engine v1: per-person baselines + masking flag | kv | BACK-003 | 2026-09-13 | [~] |
+| BACK-005 | Intervention engine: response ladder + capacity triage | kv | BACK-004 | 2026-09-14 | [~] |
+| BACK-006 | Workload rebalancing optimiser (greedy v1) | kv | BACK-005 | 2026-09-15 | [~] |
+| BACK-007 | k-anonymity aggregation + dual-key unmask endpoints | kv | BACK-002 | 2026-09-14 | [~] |
+| BACK-008 | Alert dispatch + Tele-MANAS handoff record | kv | BACK-005 | 2026-09-15 | [~] |
+| BACK-009 | who-viewed-my-data logging API | kv | BACK-002 | 2026-09-14 | [~] |
 | APP-001 | Expo app scaffold + SQLite offline sync | neel | DOCS-010 | 2026-09-10 | [ ] |
 | APP-002 | Roster/leave/pay-slip screens (roster-app-first) | neel | APP-001 | 2026-09-12 | [ ] |
 | APP-003 | 10-second check-in + instruments + validity items | neel | APP-001 | 2026-09-13 | [ ] |
@@ -56,15 +56,15 @@
 | ID | Task | Owner | Depends on | Due | Status |
 |---|---|---|---|---|---|
 | ML-001 | Signal feature definitions + clinical thresholds (absorbed into F04 + model-explainer) | kv | DOCS-006 | 2026-09-09 | [x] |
-| ML-002 | Validation harness: backtest rules engine on synthetic data | kv | QA-001, BACK-004 | 2026-09-16 | [ ] |
-| ML-003 | Fairness audit checklist + SHAP report template | kv | ML-001 | 2026-09-17 | [ ] |
-| ML-004 | ML v2 data-collection plan from counsellor labels | kv | ML-002 | 2026-09-25 | [ ] |
+| ML-002 | Validation harness: backtest rules engine on synthetic data | kv | QA-001, BACK-004 | 2026-09-16 | [~] |
+| ML-003 | Fairness audit checklist + SHAP report template | kv | ML-001 | 2026-09-17 | [~] |
+| ML-004 | ML v2 data-collection plan from counsellor labels | kv | ML-002 | 2026-09-25 | [~] |
 | ML-005 | Verify every link + citation in datasets-research.md; list dead links for neel | ayush | DOCS-006 | 2026-09-10 | [ ] |
 | ML-006 | One-page instrument factsheet (PHQ-9/GAD-7/PSS-10/ISI: items, bands, source) for the deck | ayush | DOCS-006 | 2026-09-11 | [ ] |
-| PRIV-001 | DPDP 2023 mapping audit vs implementation | kv | DOCS-005 | 2026-09-13 | [ ] |
+| PRIV-001 | DPDP 2023 mapping audit vs implementation | kv | DOCS-005 | 2026-09-13 | [~] |
 | PRIV-002 | RBAC enforcement tests | neel | BACK-001 | 2026-09-14 | [ ] |
 | PRIV-003 | Security test cases + threat model walkthrough | neel | DOCS-005 | 2026-09-15 | [ ] |
-| PRIV-004 | MHCA 2017 section 23 compliance review | kv | DOCS-005 | 2026-09-16 | [ ] |
+| PRIV-004 | MHCA 2017 section 23 compliance review | kv | DOCS-005 | 2026-09-16 | [~] |
 | PRIV-005 | Statute sources pack: copy official text of DPDP §7(i), §4–5 and MHCA §23 with source links into docs/compliance/sources.md | manan | DOCS-005 | 2026-09-10 | [ ] |
 | PRIV-006 | Manual privacy walkthrough: simple click-through checklist (consent, withdrawal, who-viewed) once the app builds; record pass/fail | manan | APP-004 | 2026-09-15 | [ ] |
 | UX-001 | Usability testing protocol + icon/voice review | neel | DOCS-015 | 2026-09-15 | [ ] |
@@ -73,7 +73,7 @@
 | QA-001 | Synthetic data generator (1000 personnel, 90 days) | neel | DOCS-013 | 2026-09-12 | [ ] |
 | QA-002 | Scripted demo persona data (Constable, 34, 3rd Bn) | neel | QA-001 | 2026-09-13 | [ ] |
 | QA-003 | E2E test execution + coverage report | neel | QA-002 | 2026-09-16 | [ ] |
-| QA-004 | Demo rehearsal checklist + recorded video fallback | kv | QA-003 | 2026-09-17 | [ ] |
+| QA-004 | Demo rehearsal checklist + recorded video fallback | kv | QA-003 | 2026-09-17 | [~] |
 | QA-005 | Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv | tejas | — | 2026-09-09 | [ ] |
 | QA-006 | Run the manual test checklist from docs/quality/test-plan.md (guided by neel); record pass/fail per case | tejas | QA-003 | 2026-09-17 | [ ] |
 | QA-007 | Demo rehearsal support + record the fallback video with risa | tejas | QA-004 | 2026-09-18 | [ ] |
@@ -87,7 +87,7 @@
 | ID | Task | Owner | Depends on | Due | Status |
 |---|---|---|---|---|---|
 | PM-001 | Daily board sync + checklist regeneration | kv | — | daily | [~] |
-| PM-002 | Internal round readiness check (deck+demo+repo) | kv | DECK-001, QA-004 | 2026-09-18 | [ ] |
-| PM-003 | Portal submission package (PDF, title, description) | kv | PM-002 | 2026-09-19 | [ ] |
-| PM-004 | Mentor feedback incorporation board (Round 2 criteria) | kv | PM-003 | 2026-09-26 | [ ] |
-| PM-005 | Finale 36h execution plan + 3-min demo script | kv | PM-004 | 2026-11-15 | [ ] |
+| PM-002 | Internal round readiness check (deck+demo+repo) | kv | DECK-001, QA-004 | 2026-09-18 | [~] |
+| PM-003 | Portal submission package (PDF, title, description) | kv | PM-002 | 2026-09-19 | [~] |
+| PM-004 | Mentor feedback incorporation board (Round 2 criteria) | kv | PM-003 | 2026-09-26 | [~] |
+| PM-005 | Finale 36h execution plan + 3-min demo script | kv | PM-004 | 2026-11-15 | [~] |

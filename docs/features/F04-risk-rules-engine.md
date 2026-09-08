@@ -1,6 +1,6 @@
 # F04 — Risk Rules Engine
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] implemented in `backend/` (BACK-004) · Last updated: 2026-09-08
 > Maps to: FR-05, FR-06, FR-07 in [prd.md](../product/prd.md) · [Architecture](../architecture/architecture.md)
 
 ## Purpose
@@ -116,15 +116,24 @@ Response sketch (`GET /risk/{pseudonym_id}/explanation`):
 - Commander dashboards / aggregation → F07 + F08.
 - Wearable-signal rules → after F03 lands its feature contract.
 
+## Implementation (BACK-004, 2026-09-08)
+
+| Piece | Path |
+|---|---|
+| Versioned YAML ruleset (fail-closed load) | `backend/config/rulesets/v1.yaml` |
+| Pure evaluator / aggregator / masking / CUSUM baseline | `backend/app/risk/` |
+| Persistence + case emit | `backend/app/risk/scorer.py` · `POST /risk/recompute` · `GET /risk/{id}/explanation` |
+| Tests | `backend/tests/test_risk_pure.py` · `test_persona_and_harness.py` |
+
 ## Definition of done
 
-- FR-05: 0–100 score from triangulated sources; per-person baselines with change-point detection implemented.
-- FR-06: every flag returns top-3 factors with observed values (explanation test passes for all demo cases).
-- FR-07: the scripted discrepancy ("fine" + 4h sleep + 60 duty days + 2 cancelled leaves) yields a masking flag with Red floor.
-- Demo persona reproduces the scripted 90-day Green → Amber → Red escalation exactly (ADR-0001 validation, test-plan).
-- 1,000-person recompute < 60 s (NFR-06).
-- Route-level test: commander role → 403 on all `/risk/*` routes.
-- Ruleset in versioned YAML; every default threshold traced to PRD/clinical reference or explicitly marked demo-cfg.
+- [x] FR-05: 0–100 score from triangulated sources; per-person baselines with change-point detection implemented.
+- [x] FR-06: every flag returns top-3 factors with observed values (explanation test).
+- [x] FR-07: the scripted discrepancy ("fine" + 4h sleep + 60 duty days + 2 cancelled leaves) yields a masking flag with Red floor.
+- [x] Demo persona reproduces Green → Amber → Red (ML-002 harness, `test_persona_arc_harness`).
+- [ ] 1,000-person recompute < 60 s (NFR-06) — blocked on QA-001 population.
+- [x] Route-level test: commander role → 403 on all `/risk/*` routes.
+- [x] Ruleset in versioned YAML; demo-cfg thresholds marked as such.
 
 ## Links
 
