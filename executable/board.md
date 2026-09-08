@@ -74,7 +74,7 @@
 | QA-002 | Scripted demo persona data (Constable, 34, 3rd Bn) | neel | QA-001 | 2026-09-13 | [ ] |
 | QA-003 | E2E test execution + coverage report | neel | QA-002 | 2026-09-16 | [ ] |
 | QA-004 | Demo rehearsal checklist + recorded video fallback | kv | QA-003 | 2026-09-17 | [x] |
-| QA-005 | Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv | tejas | — | 2026-09-09 | [ ] |
+| QA-005 | Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv | tejas | — | 2026-09-09 | [~] |
 | QA-006 | Run the manual test checklist from docs/quality/test-plan.md (guided by neel); record pass/fail per case | tejas | QA-003 | 2026-09-17 | [ ] |
 | QA-007 | Demo rehearsal support + record the fallback video with risa | tejas | QA-004 | 2026-09-18 | [ ] |
 | DECK-001 | Build the deck inside the official SIH template following docs/deck/ppt-guide.md | risa | DOCS-014, DECK-003 | 2026-09-17 | [ ] |
