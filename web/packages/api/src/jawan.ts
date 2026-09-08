@@ -2,10 +2,8 @@ import { apiFetch } from "./http";
 
 /**
  * Jawan-role client (self-scope only).
- *
- * NOTE: response shapes are v1 assumptions — kv's backend is the source of
- * truth (http://127.0.0.1:8000/docs). Fields are tolerated loosely (unknown)
- * until shapes are confirmed; adjust here, not in the app.
+ * Contract source of truth: kv's backend (backend/app/api/routers/app_data.py,
+ * privacy.py) — verified live on 2026-09-08.
  */
 
 export type LoginResult = {
@@ -29,42 +27,94 @@ export async function login(username: string, password: string): Promise<LoginRe
   };
 }
 
-export type ConsentScope = "checkin" | "instrument" | "voice" | "passive" | "pulse" | "buddy";
+/**
+ * Check-in wire format (kv): mood_label from a closed set the rules engine
+ * reads ("fine"|"good"|"great" → fine), mood_score 0–10 where HIGHER is
+ * better, recorded_at as a local YYYY-MM-DD. The app's stress slider is
+ * inverted here so UI framing stays "how heavy did today feel".
+ */
+export const MOOD_LABELS = {
+  1: "rough",
+  2: "low",
+  3: "ok",
+  4: "good",
+  5: "fine",
+} as const;
 
-export async function grantConsent(scope: ConsentScope): Promise<void> {
-  await apiFetch("/app/consent", { method: "POST", body: JSON.stringify({ scope, granted: true }) });
-}
-
-export async function withdrawConsent(scope: ConsentScope): Promise<void> {
-  await apiFetch("/app/consent/withdraw", { method: "POST", body: JSON.stringify({ scope }) });
-}
-
-export type CheckInPayload = {
-  client_uuid: string;
-  captured_at: string;
-  local_date: string;
-  mood_emoji: number; // 1–5
-  stress_slider: number; // 0–10
-  free_text?: string;
+export type CheckInWire = {
+  mood_label: string;
+  mood_score: number;
+  recorded_at: string;
 };
 
-/** Batch, idempotent by client_uuid (F02). */
-export async function submitCheckins(items: CheckInPayload[]): Promise<void> {
-  await apiFetch("/app/checkins", {
-    method: "POST",
-    body: JSON.stringify({ client_uuid: items[0]?.client_uuid, items }),
-  });
+export function toCheckInWire(moodEmoji: number, stressSlider: number, localDate: string): CheckInWire {
+  return {
+    mood_label: MOOD_LABELS[moodEmoji as keyof typeof MOOD_LABELS] ?? "ok",
+    mood_score: 10 - stressSlider,
+    recorded_at: localDate,
+  };
 }
 
-export async function submitInstrument(payload: Record<string, unknown>): Promise<void> {
-  await apiFetch("/app/instruments", { method: "POST", body: JSON.stringify(payload) });
+/** One POST per check-in (kv's /app/checkins takes a single row). */
+export async function submitCheckin(wire: CheckInWire): Promise<void> {
+  await apiFetch("/app/checkins", { method: "POST", body: JSON.stringify(wire) });
 }
 
-export async function getMyTrend(): Promise<unknown> {
-  return apiFetch("/app/me/trend");
+export type ConsentBundle = "checkin" | "instruments" | "passive" | "unit_pulse";
+
+export type ConsentWire = {
+  bundle_id: ConsentBundle;
+  purpose_string: string;
+  data_categories: string[];
+  language: "en" | "hi";
+};
+
+/** Not idempotent server-side — grant once per bundle per device. */
+export async function grantConsent(wire: ConsentWire): Promise<void> {
+  await apiFetch("/app/consent", { method: "POST", body: JSON.stringify(wire) });
 }
 
-export async function getWhoViewed(): Promise<unknown[]> {
-  const body = (await apiFetch("/app/who-viewed")) as unknown;
-  return Array.isArray(body) ? body : [];
+/** Withdraws ALL bundles (kv's semantics), silent to command. */
+export async function withdrawAllConsent(): Promise<{ withdrawn: number; command_visible: boolean }> {
+  return (await apiFetch("/app/consent/withdraw", { method: "POST", body: "{}" })) as {
+    withdrawn: number;
+    command_visible: boolean;
+  };
+}
+
+export type InstrumentWire = {
+  instrument: string;
+  score: number;
+  item_9?: number;
+  validity_fail?: boolean;
+  straight_lining?: boolean;
+  too_fast?: boolean;
+  all_max?: boolean;
+  recorded_at?: string;
+};
+
+export async function submitInstrument(wire: InstrumentWire): Promise<void> {
+  await apiFetch("/app/instruments", { method: "POST", body: JSON.stringify(wire) });
+}
+
+export type TrendPoint = { as_of: string; score: number; tier: string };
+
+export async function getMyTrend(): Promise<{ disclaimer_key: string; trend: TrendPoint[] }> {
+  return (await apiFetch("/app/me/trend")) as { disclaimer_key: string; trend: TrendPoint[] };
+}
+
+export type WhoViewedEntry = {
+  role: string;
+  when: string;
+  why: string;
+  action: string;
+};
+
+export type WhoViewed = {
+  title_key: string;
+  entries: WhoViewedEntry[];
+};
+
+export async function getWhoViewed(): Promise<WhoViewed> {
+  return (await apiFetch("/app/who-viewed")) as WhoViewed;
 }

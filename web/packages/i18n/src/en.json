@@ -48,6 +48,8 @@
   "consent.withdraw.action": "Withdraw",
   "consent.withdraw.confirm": "Withdraw this permission now? It takes effect immediately.",
   "consent.scope.checkin": "Daily 10-second check-in",
+  "consent.checkin.agree": "Share this check-in (wellness support only)",
+  "consent.checkin.error": "Tick the consent box to share this check-in",
   "consent.scope.instrument": "Monthly wellness questionnaire",
   "consent.scope.voice": "Voice notes (stay on this device)",
   "consent.scope.passive": "Rest and screen-time signals",

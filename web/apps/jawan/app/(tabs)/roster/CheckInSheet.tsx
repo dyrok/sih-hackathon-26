@@ -5,8 +5,10 @@ import { useT } from "@saarthi/i18n";
 import { Button } from "@saarthi/ui";
 import { enqueue, getClientUuid, notifyQueueChanged } from "@saarthi/sync";
 import type { QueueItem } from "@saarthi/sync";
+import { grantConsent, toCheckInWire } from "@saarthi/api";
 
 const EMOJI = ["😞", "😕", "😐", "🙂", "😄"] as const;
+const CONSENTED_KEY = "saarthi.consented.checkin";
 
 type Props = {
   onClose: () => void;
@@ -16,17 +18,20 @@ type Props = {
 /**
  * 10-second check-in sheet (F02): ≤3 taps — emoji → slider → save.
  * Writes to the local queue instantly; the network is never required (ADR-0005).
+ * First save grants the checkin consent bundle explicitly (checkbox) — consent
+ * is never granted silently.
  * Native <dialog> + showModal() gives focus trap, inert background, Escape,
  * and focus restore on close for free.
  */
 export function CheckInSheet({ onClose, onSaved }: Props) {
-  const { t } = useT();
+  const { t, locale } = useT();
   const dialogRef = useRef<HTMLDialogElement>(null);
   const emojiGroupRef = useRef<HTMLDivElement>(null);
   const [mood, setMood] = useState<number | null>(null);
   const [slider, setSlider] = useState(5);
   const [note, setNote] = useState("");
-  const [moodError, setMoodError] = useState(false);
+  const [agreed, setAgreed] = useState(() => localStorage.getItem(CONSENTED_KEY) === "1");
+  const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -45,22 +50,43 @@ export function CheckInSheet({ onClose, onSaved }: Props) {
   const save = async () => {
     if (saving) return;
     if (mood === null) {
-      setMoodError(true);
+      setError("mood");
       emojiGroupRef.current?.querySelector("button")?.focus();
       return;
     }
-    setMoodError(false);
+    if (!agreed) {
+      setError("consent");
+      return;
+    }
+    setError(null);
     setSaving(true);
     try {
       const client_uuid = await getClientUuid();
+      const wire = toCheckInWire(mood, slider, localDate);
+
+      // Consent first (kv's API is consent-gated). Online: grant now.
+      // Offline: queue the grant so it syncs before the check-in (FIFO).
+      if (!localStorage.getItem(CONSENTED_KEY)) {
+        const consentWire = {
+          bundle_id: "checkin" as const,
+          purpose_string: t("consent.scope.checkin"),
+          data_categories: ["checkin", "sleep", "instruments"],
+          language: locale,
+        };
+        try {
+          await grantConsent(consentWire);
+        } catch {
+          await enqueue({ table: "consent", client_uuid, captured_at: new Date().toISOString(), payload: consentWire });
+        }
+        localStorage.setItem(CONSENTED_KEY, "1");
+      }
+
       const item: QueueItem = {
         table: "checkin",
         client_uuid,
         captured_at: new Date().toISOString(),
         payload: {
-          local_date: localDate,
-          mood_emoji: mood,
-          stress_slider: slider,
+          ...wire,
           ...(note.trim() ? { free_text: note.trim() } : {}),
         },
       };
@@ -102,7 +128,7 @@ export function CheckInSheet({ onClose, onSaved }: Props) {
               className={`emoji-btn${selected ? " emoji-btn--selected" : ""}`}
               onClick={() => {
                 setMood(value);
-                setMoodError(false);
+                setError((e) => (e === "mood" ? null : e));
               }}
             >
               <span aria-hidden="true">{face}</span>
@@ -111,7 +137,7 @@ export function CheckInSheet({ onClose, onSaved }: Props) {
           );
         })}
       </div>
-      {moodError && (
+      {error === "mood" && (
         <p className="sheet__error" role="alert">
           {t("checkin.error.mood")}
         </p>
@@ -145,6 +171,23 @@ export function CheckInSheet({ onClose, onSaved }: Props) {
         placeholder={t("checkin.optional.placeholder")}
         onChange={(e) => setNote(e.target.value)}
       />
+
+      <label className="consent-check">
+        <input
+          type="checkbox"
+          checked={agreed}
+          onChange={(e) => {
+            setAgreed(e.target.checked);
+            setError((err) => (err === "consent" ? null : err));
+          }}
+        />
+        <span>{t("consent.checkin.agree")}</span>
+      </label>
+      {error === "consent" && (
+        <p className="sheet__error" role="alert">
+          {t("consent.checkin.error")}
+        </p>
+      )}
 
       <div className="sheet-actions">
         <Button variant="quiet" onClick={close}>

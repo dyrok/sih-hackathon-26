@@ -87,19 +87,10 @@ export function startSyncEngine(opts: SyncEngineOptions): { stop: () => void } {
       setState("syncing");
       const token = getToken();
 
-      // Check-ins batch together (idempotent by client_uuid).
-      const checkins = items.filter((i) => i.table === "checkin");
-      const others = items.filter((i) => i.table !== "checkin");
-
-      if (checkins.length > 0) {
-        await postJson(`${apiBase}${queueEndpoint("checkin")}`, token, {
-          client_uuid: checkins[0]!.client_uuid,
-          items: checkins.map((i) => ({ ...i.payload, client_uuid: i.client_uuid, captured_at: i.captured_at })),
-        });
-        for (const i of checkins) await removeFromQueue(i.id!);
-      }
-
-      for (const item of others) {
+      // kv's endpoints take one item per request (POST /app/checkins is a
+      // single row). Drain oldest-first; only a 2xx removes an item, so
+      // retries can never duplicate (client_uuid is carried for audit).
+      for (const item of items) {
         await postJson(`${apiBase}${queueEndpoint(item.table)}`, token, {
           ...item.payload,
           client_uuid: item.client_uuid,

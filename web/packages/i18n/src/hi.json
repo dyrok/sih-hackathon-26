@@ -48,6 +48,8 @@
   "consent.withdraw.action": "Wapas lein",
   "consent.withdraw.confirm": "Abhi ye ijaazat wapas lein? Turant lagu hoga.",
   "consent.scope.checkin": "Roz ka 10-second check-in",
+  "consent.checkin.agree": "Ye check-in share karein (sirf wellness support)",
+  "consent.checkin.error": "Check-in share karne ke liye consent box tick karein",
   "consent.scope.instrument": "Mahine ka wellness questionnaire",
   "consent.scope.voice": "Voice notes (is device par rehte hain)",
   "consent.scope.passive": "Aaram aur screen-time ke signals",
