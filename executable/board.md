@@ -59,8 +59,8 @@
 | ML-002 | Validation harness: backtest rules engine on synthetic data | kv | QA-001, BACK-004 | 2026-09-16 | [x] |
 | ML-003 | Fairness audit checklist + SHAP report template | kv | ML-001 | 2026-09-17 | [x] |
 | ML-004 | ML v2 data-collection plan from counsellor labels | kv | ML-002 | 2026-09-25 | [x] |
-| ML-005 | Verify every link + citation in datasets-research.md; list dead links for neel | ayush | DOCS-006 | 2026-09-10 | [ ] |
-| ML-006 | One-page instrument factsheet (PHQ-9/GAD-7/PSS-10/ISI: items, bands, source) for the deck | ayush | DOCS-006 | 2026-09-11 | [ ] |
+| ML-005 | Verify every link + citation in datasets-research.md; list dead links for neel | ayush | DOCS-006 | 2026-09-10 | [x] |
+| ML-006 | One-page instrument factsheet (PHQ-9/GAD-7/PSS-10/ISI: items, bands, source) for the deck | ayush | DOCS-006 | 2026-09-11 | [x] |
 | PRIV-001 | DPDP 2023 mapping audit vs implementation | kv | DOCS-005 | 2026-09-13 | [x] |
 | PRIV-002 | RBAC enforcement tests | neel | BACK-001 | 2026-09-14 | [ ] |
 | PRIV-003 | Security test cases + threat model walkthrough | neel | DOCS-005 | 2026-09-15 | [ ] |
