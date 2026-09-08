@@ -2,7 +2,7 @@
    Data offline-ness lives in IndexedDB (packages/sync); this SW only keeps
    the shell loadable without a network. API calls are never cached. */
 
-const CACHE = "saarthi-shell-v1";
+const CACHE = "saarthi-shell-v2";
 const SHELL = ["/", "/roster", "/manifest.webmanifest", "/icons/icon.svg"];
 
 self.addEventListener("install", (event) => {
