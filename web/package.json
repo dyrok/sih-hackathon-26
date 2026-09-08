@@ -1,0 +1,17 @@
+{
+  "name": "saarthi-web",
+  "private": true,
+  "version": "0.1.0",
+  "description": "SAARTHI client apps — Next.js web monorepo (jawan PWA, counsellor console, commander dashboard)",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "dev:jawan": "bun run --cwd apps/jawan dev",
+    "dev:counsellor": "bun run --cwd apps/counsellor dev",
+    "dev:commander": "bun run --cwd apps/commander dev",
+    "build": "bun run --filter './apps/*' build",
+    "lint": "bun run --filter './apps/*' lint"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  }
+}

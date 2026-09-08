@@ -1,0 +1,284 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--sa-color-surface-base);
+  color: var(--sa-color-ink-primary);
+  font-family: var(--sa-font-sans);
+  font-size: var(--sa-type-sm);
+  line-height: var(--sa-line-height);
+}
+
+/* Devanagari line-height +0.1 (design.md §3). Never fixed-height text containers. */
+[data-locale="hi"] body {
+  line-height: var(--sa-line-height-hi);
+}
+
+.app-shell {
+  width: min(100%, 430px);
+  margin: 0 auto;
+  min-height: 100dvh;
+  position: relative;
+  background: var(--sa-color-surface-base);
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sa-space-2);
+  padding: var(--sa-space-2) var(--sa-space-2) 0;
+}
+
+.app-brand {
+  font-size: var(--sa-type-md);
+  font-weight: 700;
+  color: var(--sa-color-brand-olive);
+  letter-spacing: 0.02em;
+}
+
+.app-main {
+  padding: var(--sa-space-2);
+  padding-bottom: 96px;
+}
+
+/* --- Login --- */
+.login-wrap {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--sa-space-3) var(--sa-space-2);
+  width: min(100%, 430px);
+  margin: 0 auto;
+}
+
+.login-title {
+  font-size: var(--sa-type-xl);
+  font-weight: 700;
+  color: var(--sa-color-brand-olive);
+  margin: 0 0 var(--sa-space-1);
+}
+
+.login-sub {
+  font-size: var(--sa-type-sm);
+  color: var(--sa-color-ink-secondary);
+  margin: 0 0 var(--sa-space-3);
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+}
+
+.field-label {
+  display: block;
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-ink-secondary);
+  margin-bottom: var(--sa-space-1);
+}
+
+.field-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 var(--sa-space-2);
+  font-family: inherit;
+  font-size: var(--sa-type-sm);
+  color: var(--sa-color-ink-primary);
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 8px;
+}
+
+.field-input:focus-visible {
+  outline: 2px solid var(--sa-color-accent-saffron);
+  outline-offset: 2px;
+}
+
+.login-error {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-state-amber);
+  margin: 0;
+}
+
+/* --- Service cards (roster home) --- */
+.card-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sa-space-2);
+  margin-top: var(--sa-space-2);
+}
+
+.service-card {
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  padding: var(--sa-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+  min-height: 96px;
+}
+
+.service-card__icon {
+  color: var(--sa-color-brand-olive);
+}
+
+.service-card__label {
+  font-size: var(--sa-type-sm);
+  font-weight: 600;
+  color: var(--sa-color-ink-primary);
+  margin: 0;
+}
+
+.service-card__detail {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  margin: 0;
+}
+
+.section-title {
+  font-size: var(--sa-type-md);
+  font-weight: 700;
+  margin: var(--sa-space-3) 0 0;
+}
+
+.demo-note {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  margin-top: var(--sa-space-2);
+}
+
+/* --- Check-in sheet --- */
+.sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgb(47 51 44 / 0.4);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 40;
+}
+
+.sheet {
+  width: min(100%, 430px);
+  background: var(--sa-color-surface-raised);
+  border-radius: 16px 16px 0 0;
+  padding: var(--sa-space-2) var(--sa-space-2) calc(var(--sa-space-2) + env(safe-area-inset-bottom, 0px));
+  max-height: 92dvh;
+  overflow-y: auto;
+}
+
+.sheet__title {
+  font-size: var(--sa-type-lg);
+  font-weight: 700;
+  margin: 0 0 var(--sa-space-1);
+}
+
+.sheet__sub {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  margin: 0 0 var(--sa-space-2);
+}
+
+.emoji-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sa-space-1);
+  margin-bottom: var(--sa-space-3);
+}
+
+.emoji-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 8px 4px;
+  cursor: pointer;
+  font-size: 24px;
+  min-height: 64px;
+}
+
+.emoji-btn--selected {
+  border-color: var(--sa-color-brand-olive);
+  background: var(--sa-color-brand-olive-soft);
+}
+
+.emoji-btn__label {
+  font-family: var(--sa-font-sans);
+  font-size: 10px;
+  color: var(--sa-color-ink-secondary);
+}
+
+.slider-label {
+  display: block;
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-ink-secondary);
+  margin-bottom: var(--sa-space-1);
+}
+
+.slider-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sa-space-2);
+  margin-bottom: var(--sa-space-3);
+}
+
+.slider-input {
+  flex: 1;
+  accent-color: var(--sa-color-brand-olive);
+  min-height: 48px;
+}
+
+.slider-value {
+  font-size: var(--sa-type-md);
+  font-weight: 700;
+  color: var(--sa-color-brand-olive);
+  min-width: 24px;
+  text-align: center;
+}
+
+.sheet-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sa-space-2);
+  margin-top: var(--sa-space-2);
+}
+
+/* --- Generic list rows (welfare / me) --- */
+.list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sa-space-2);
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  padding: var(--sa-space-2);
+  margin-bottom: var(--sa-space-2);
+}
+
+.list-row__label {
+  display: flex;
+  align-items: center;
+  gap: var(--sa-space-2);
+  font-weight: 600;
+}
+
+.list-row__icon {
+  color: var(--sa-color-brand-olive);
+}

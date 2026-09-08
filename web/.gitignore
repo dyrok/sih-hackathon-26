@@ -1,0 +1,9 @@
+node_modules/
+.next/
+out/
+packages/*/dist/*
+!packages/tokens/dist/
+!packages/tokens/dist/tokens.css
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store

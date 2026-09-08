@@ -40,7 +40,7 @@
 | BACK-007 | k-anonymity aggregation + dual-key unmask endpoints | kv | BACK-002 | 2026-09-14 | [ ] |
 | BACK-008 | Alert dispatch + Tele-MANAS handoff record | kv | BACK-005 | 2026-09-15 | [ ] |
 | BACK-009 | who-viewed-my-data logging API | kv | BACK-002 | 2026-09-14 | [ ] |
-| APP-001 | Expo app scaffold + SQLite offline sync | neel | DOCS-010 | 2026-09-10 | [ ] |
+| APP-001 | Expo app scaffold + SQLite offline sync | neel | DOCS-010 | 2026-09-10 | [~] |
 | APP-002 | Roster/leave/pay-slip screens (roster-app-first) | neel | APP-001 | 2026-09-12 | [ ] |
 | APP-003 | 10-second check-in + instruments + validity items | neel | APP-001 | 2026-09-13 | [ ] |
 | APP-004 | Consent flow + silent withdrawal | neel | APP-001 | 2026-09-13 | [ ] |

@@ -1,0 +1,129 @@
+/* SAARTHI shared component styles — tokens only via CSS vars from @saarthi/tokens. */
+
+.sa-btn {
+  font-family: var(--sa-font-sans);
+  font-size: var(--sa-type-sm);
+  min-height: 48px;
+  padding: 0 var(--sa-space-2);
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: opacity 120ms ease-out;
+}
+.sa-btn:focus-visible {
+  outline: 2px solid var(--sa-color-accent-saffron);
+  outline-offset: 2px;
+}
+.sa-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.sa-btn--primary {
+  background: var(--sa-color-brand-olive);
+  color: var(--sa-color-surface-raised);
+}
+.sa-btn--secondary {
+  background: var(--sa-color-brand-olive-soft);
+  color: var(--sa-color-ink-primary);
+}
+.sa-btn--quiet {
+  background: transparent;
+  color: var(--sa-color-brand-olive);
+  min-height: 40px;
+}
+
+.sa-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+}
+.sa-chip--green { background: #e8f0ea; background: color-mix(in srgb, var(--sa-color-state-green) 15%, transparent); color: var(--sa-color-state-green); border-color: var(--sa-color-state-green); }
+.sa-chip--amber { background: #fbf1dd; background: color-mix(in srgb, var(--sa-color-state-amber) 15%, transparent); color: var(--sa-color-state-amber); border-color: var(--sa-color-state-amber); }
+.sa-chip--red { background: #f6e8e6; background: color-mix(in srgb, var(--sa-color-state-red) 12%, transparent); color: var(--sa-color-state-red); border-color: var(--sa-color-state-red); }
+.sa-chip--critical { background: #f3e7e6; background: color-mix(in srgb, var(--sa-color-state-critical) 12%, transparent); color: var(--sa-color-state-critical); border-color: var(--sa-color-state-critical); }
+
+.sa-syncpill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  background: var(--sa-color-brand-olive-soft);
+  border-radius: 999px;
+  padding: 4px 12px;
+  min-height: 28px;
+}
+/* Queued data is never error-styled; only real failures get a quiet amber note. */
+.sa-syncpill--error {
+  color: var(--sa-color-state-amber);
+}
+
+.sa-checkincard {
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 16px;
+  padding: var(--sa-space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+.sa-checkincard__title {
+  font-size: var(--sa-type-md);
+  font-weight: 700;
+  color: var(--sa-color-ink-primary);
+  margin: 0;
+}
+.sa-checkincard__sub {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  margin: 0;
+}
+.sa-checkincard__cta {
+  align-self: flex-start;
+  background: var(--sa-color-accent-saffron);
+  color: var(--sa-color-surface-raised);
+}
+
+.sa-tabs {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(100%, 430px);
+  display: flex;
+  background: var(--sa-color-surface-raised);
+  border-top: 1px solid var(--sa-color-brand-olive-soft);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  z-index: 20;
+}
+.sa-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 0 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--sa-color-ink-secondary);
+  min-height: 56px;
+}
+.sa-tab:focus-visible {
+  outline: 2px solid var(--sa-color-accent-saffron);
+  outline-offset: -2px;
+}
+.sa-tab--active {
+  color: var(--sa-color-brand-olive);
+}
+.sa-tab__label {
+  font-family: var(--sa-font-sans);
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+}

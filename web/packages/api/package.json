@@ -1,0 +1,10 @@
+{
+  "name": "@saarthi/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SAARTHI role-scoped typed API clients. Path lint: consoles never import another role's client.",
+  "exports": {
+    ".": "./src/index.ts",
+    "./jawan": "./src/jawan.ts"
+  }
+}

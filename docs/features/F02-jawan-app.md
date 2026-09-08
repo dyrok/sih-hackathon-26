@@ -1,7 +1,8 @@
 # F02 — Jawan App (roster-first voluntary check-in, consent, transparency)
 
-> Owner: neel · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: neel · Status: [~] drafting · Last updated: 2026-09-08
 > Maps to: FR-02, FR-04, FR-15, FR-19 in [prd.md](../product/prd.md) (FR-17 silent withdrawal surfaces here, owned by [F08](F08-privacy-safety-architecture.md)) · [Architecture](../architecture/architecture.md) · [Design system](../architecture/design/design.md)
+> Platform (team decision, 2026-09-08): the jawan app is a **web app** — Next.js, mobile-first, installable PWA — not a native Expo app. Offline-first is preserved via a Service Worker app shell + IndexedDB outbox queue keyed by `client_uuid` (supersedes the native/SQLite wording of ADR-0005; see ADR-0007).
 
 ## Purpose
 The app personnel already open daily — duty roster, leave, pay slip — with a 10-second wellness check-in riding on that home screen ([ADR-0004](../architecture/decisions/0004-roster-app-first-adoption.md)). Zero adoption ask; welfare data rides an existing habit. The app is never branded as therapy: framing is "fitness for duty" + "parivaar welfare". It is also where trust is demonstrated rather than promised: unbundled consent, silent withdrawal, and who-viewed-my-data receipts.
@@ -48,18 +49,18 @@ i18n keys introduced by this feature (design.md §8 — all strings ship via key
 | `buddy.state.*` | ok / quiet / need a word | theek / thoda chup / baat karo |
 
 ## API surface (endpoints, role-scoped)
-Role `jawan`; every endpoint resolves the subject from the auth token — no client-supplied personnel ID is accepted (403 otherwise).
-- `POST /v1/checkins` — batch sync of queued items, idempotent by `client_uuid`
-- `POST /v1/instruments/responses` — server rejects an instrument already taken this month
-- `GET /v1/me/trend` — own data only
-- `GET /v1/me/access-receipts` — feeds screen 6
-- `GET /v1/me/consents` · `PUT /v1/me/consents` — withdrawal must produce no command-visible side effect (FR-17 test)
-- `POST /v1/pulse/ratings` · `GET /v1/pulse/aggregate` — k ≥ 5 enforced server-side
-- `GET/POST /v1/buddy/status` — coarse enum only
-- Roster / leave / payslip endpoints are thin read proxies over F01 ingested data.
+Role `jawan`; every endpoint resolves the subject from the auth token — no client-supplied personnel ID is accepted (403 otherwise). kv's live backend (FastAPI) is the source of truth — names below match the running API (see its `/docs`), superseding the earlier `/v1/*` naming in this file.
+- `POST /auth/login` — username/password → bearer token (demo personas: `jawan.demo` / `counsellor.a` / `welfare.a` / `commander.3bn`)
+- `POST /app/checkins` — batch sync of queued items, idempotent by `client_uuid`
+- `POST /app/instruments` — server rejects an instrument already taken this month
+- `GET /app/me/trend` — own data only
+- `GET /app/who-viewed` — feeds screen 6 (access receipts incl. unmask events)
+- `POST /app/consent` · `POST /app/consent/withdraw` — withdrawal must produce no command-visible side effect (FR-17 test)
+- `GET /aggregates/unit/3BN` — commander-side k ≥ 5 aggregates (consumed by F07, not by this app)
+- Roster / leave / payslip screens: **mock adapter in-app for the prototype** until kv exposes HRMS thin read proxies (APP-002 swaps the adapter, not the screens).
 
 ## States (idle/loading/empty/error/offline)
-- **Offline:** check-in writes to local SQLite instantly; SyncPill: "3 check-ins saved, will send" (`sync.pill.queued`) — queued data never renders in error styling (ADR-0005). Instruments run fully offline; sync resumes opportunistically.
+- **Offline:** check-in writes to the local IndexedDB queue instantly; SyncPill: "3 check-ins saved, will send" (`sync.pill.queued`) — queued data never renders in error styling (ADR-0005). The app shell is cached by a Service Worker, so an airplane-mode reload still opens the app. Instruments run fully offline; sync resumes opportunistically.
 - **Empty:** first-run teaching copy: "Pehli baar check-in — 10 second lagenge" (`home.checkin.empty`).
 - **Error:** recovery paths, never blame: "Sync nahi hua. Data safe hai, dobara try karenge." (`sync.error.recovery`).
 - **Already done / disabled:** instrument card shows "Is mahine ho gaya" (`instrument.done`); buddy slot empty state explains pairing in one line.
@@ -75,15 +76,15 @@ Role `jawan`; every endpoint resolves the subject from the auth token — no cli
 - No PII (name, service number) travels with wellness payloads; screenshots for demo decks must use synthetic data (F09).
 
 ## Out of scope / non-goals
-Diagnosis or treatment; clinician chat; social feed or peer ranking; streaks/leaderboards; iOS (ADR-0005); wearable pairing (F03 owns the surface); ambient listening (F03/ADR-0002 anti-goal); regional language translation at v1 (keys reserved); HR workflow authoring (leave approval stays in existing HRMS).
+Diagnosis or treatment; clinician chat; social feed or peer ranking; streaks/leaderboards; native app binaries for any OS (web-first per team decision 2026-09-08 — the PWA installs to the home screen but ships no app-store build); wearable pairing (F03 owns the surface); ambient listening (F03/ADR-0002 anti-goal); regional language translation at v1 (keys reserved); HR workflow authoring (leave approval stays in existing HRMS).
 
 ## Definition of done
-- [ ] 10-second check-in completes offline on an API 26 low-end device; queued sync verified across an airplane-mode toggle, zero duplicates.
+- [ ] 10-second check-in completes offline in a phone browser on a low-end Android-class device; queued sync verified across an airplane-mode toggle (incl. an offline page reload via the SW), zero duplicates.
 - [ ] All six instruments ship with adapted `hi`/`en` strings + recorded voice prompts; adaptation review signed off; zero invented items.
 - [ ] Unbundled consent works end to end; automated test proves withdrawal leaves zero command-visible trace on F08 endpoints.
 - [ ] Access receipts render every real audit event (including unmask) within one sync cycle.
 - [ ] Unit pulse aggregate suppresses cells with < 5 contributors server-side.
-- [ ] All strings via i18n keys; Devanagari line-height rule holds (design.md §3); check-in measured at ≤ 3 taps on device.
+- [ ] All strings via i18n keys; Devanagari line-height rule holds (design.md §3); check-in measured at ≤ 3 taps in a phone browser.
 
 ## Links
 [ADR-0002](../architecture/decisions/0002-on-device-voice-inference.md) · [ADR-0003](../architecture/decisions/0003-two-tier-output-k-anonymity.md) · [ADR-0004](../architecture/decisions/0004-roster-app-first-adoption.md) · [ADR-0005](../architecture/decisions/0005-offline-first-low-end-android.md) · [F03](F03-on-device-signals.md) · [F04](F04-risk-rules-engine.md) · [F05](F05-intervention-engine.md) · [F08](F08-privacy-safety-architecture.md) · [adoption-strategy.md](../product/adoption-strategy.md) · [dpdp-2023-mapping.md](../compliance/dpdp-2023-mapping.md) · [mental-healthcare-act-2017.md](../compliance/mental-healthcare-act-2017.md)
