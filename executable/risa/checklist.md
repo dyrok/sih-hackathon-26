@@ -1,6 +1,6 @@
 # Checklist — risa
 
-> Auto-generated from [board.md](../board.md) on 2026-09-06 00:08
+> Auto-generated from [board.md](../board.md) on 2026-09-08 22:57
 > Edit status in board.md, not here.
 
 ## Phase 0 — Documentation brain (2026-09-05 → 09-08)

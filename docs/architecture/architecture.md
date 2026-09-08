@@ -1,6 +1,6 @@
 # Architecture — SAARTHI
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] current (backend v1 live in `backend/`) · Last updated: 2026-09-08
 > Format: arc42-lite (sections 1, 3, 4, 6, 8, 12 only — full arc42 is overkill for a hackathon). Diagrams: C4 levels 1–2 as committed mermaid text.
 
 ## 1. Introduction & goals

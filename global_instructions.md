@@ -1,7 +1,7 @@
 # global_instructions.md — SAARTHI Global Operating Manual
 
 > **Read this FIRST** — every team member and every AI agent. [`AGENTS.md`](AGENTS.md) is the law; this file is the map: the master roadmap, the complete work progress checklist, and the global working instructions.
-> Owner: kv · Status: [~] live (kv updates §5 progress at each phase gate) · Last updated: 2026-09-05
+> Owner: kv · Status: [~] live (kv updates §5 progress at each phase gate) · Last updated: 2026-09-08
 
 ## 1. What we are building
 
@@ -46,14 +46,14 @@ git switch <your-name>            # your branch only, never main
 
 > Per-task live status: [board.md](executable/board.md). kv mirrors status into this checklist at each daily sync (PM-001) and ticks phase gates when the gate criteria are met. Legend: `[ ]` todo · `[~]` in-progress · `[x]` done.
 
-### Progress snapshot: 17 / 66 tasks complete (26%)
+### Progress snapshot: 33 / 66 tasks complete (50%)
 
 | Phase | Window | Tasks | Done | Gate status |
 |---|---|---|---|---|
 | 0 — Docs brain | Sep 5–8 | 16 | 16 | [x] every doc has owner + stamp |
-| 1 — Prototype v1 | Sep 8–15 | 19 | 0 | [ ] full demo loop runs on synthetic data |
-| 2 — Theory, QA, demo package | Sep 9–19 | 26 | 1 | [ ] deck PDF + video + rehearsal done |
-| 3 — Submission & hardening | Sep 18 → | 5 | 0 | [ ] portal submission before 20 Sep |
+| 1 — Prototype v1 | Sep 8–15 | 19 | 9 | [~] backend demo loop merged; apps still neel |
+| 2 — Theory, QA, demo package | Sep 9–19 | 26 | 5 | [ ] deck PDF + video + rehearsal done |
+| 3 — Submission & hardening | Sep 18 → | 5 | 2 | [ ] portal submission before 20 Sep |
 
 ### Phase 0 — Documentation brain (2026-09-05 → 09-08) — COMPLETE
 
@@ -80,15 +80,15 @@ git switch <your-name>            # your branch only, never main
 
 | Task | Owner | Due | Status |
 |---|---|---|---|
-| BACK-001 FastAPI + Postgres scaffold, JWT, RBAC | kv | 09-10 | [ ] |
-| BACK-002 Immutable audit log + break-glass | kv | 09-10 | [ ] |
-| BACK-003 HR ingestion + signal features | kv | 09-12 | [ ] |
-| BACK-004 Rules engine v1 + baselines + masking flag | kv | 09-13 | [ ] |
-| BACK-005 Response ladder + capacity triage | kv | 09-14 | [ ] |
-| BACK-006 Workload rebalancing optimiser | kv | 09-15 | [ ] |
-| BACK-007 k-anonymity aggregation + dual-key unmask | kv | 09-14 | [ ] |
-| BACK-008 Alert dispatch + Tele-MANAS record | kv | 09-15 | [ ] |
-| BACK-009 who-viewed-my-data logging API | kv | 09-14 | [ ] |
+| BACK-001 FastAPI + Postgres scaffold, JWT, RBAC | kv | 09-10 | [x] |
+| BACK-002 Immutable audit log + break-glass | kv | 09-10 | [x] |
+| BACK-003 HR ingestion + signal features | kv | 09-12 | [x] |
+| BACK-004 Rules engine v1 + baselines + masking flag | kv | 09-13 | [x] |
+| BACK-005 Response ladder + capacity triage | kv | 09-14 | [x] |
+| BACK-006 Workload rebalancing optimiser | kv | 09-15 | [x] |
+| BACK-007 k-anonymity aggregation + dual-key unmask | kv | 09-14 | [x] |
+| BACK-008 Alert dispatch + Tele-MANAS record | kv | 09-15 | [x] |
+| BACK-009 who-viewed-my-data logging API | kv | 09-14 | [x] |
 | APP-001 Expo scaffold + SQLite offline sync | neel | 09-10 | [ ] |
 | APP-002 Roster/leave/pay-slip screens | neel | 09-12 | [ ] |
 | APP-003 10s check-in + instruments + validity items | neel | 09-13 | [ ] |
@@ -105,15 +105,15 @@ git switch <your-name>            # your branch only, never main
 | Task | Owner | Due | Status |
 |---|---|---|---|
 | ML-001 Signal feature definitions (absorbed into F04) | kv | 09-09 | [x] |
-| ML-002 Validation harness (backtest on synthetic data) | kv | 09-16 | [ ] |
-| ML-003 Fairness audit checklist + SHAP template | kv | 09-17 | [ ] |
-| ML-004 ML v2 data-collection plan | kv | 09-25 | [ ] |
+| ML-002 Validation harness (backtest on synthetic data) | kv | 09-16 | [x] |
+| ML-003 Fairness audit checklist + SHAP template | kv | 09-17 | [x] |
+| ML-004 ML v2 data-collection plan | kv | 09-25 | [x] |
 | ML-005 Verify links/citations in datasets-research.md | ayush | 09-10 | [ ] |
 | ML-006 One-page instrument factsheet for the deck | ayush | 09-11 | [ ] |
-| PRIV-001 DPDP mapping audit vs implementation | kv | 09-13 | [ ] |
+| PRIV-001 DPDP mapping audit vs implementation | kv | 09-13 | [x] |
 | PRIV-002 RBAC enforcement tests | neel | 09-14 | [ ] |
 | PRIV-003 Security test cases + threat model walkthrough | neel | 09-15 | [ ] |
-| PRIV-004 MHCA §23 compliance review | kv | 09-16 | [ ] |
+| PRIV-004 MHCA §23 compliance review | kv | 09-16 | [x] |
 | PRIV-005 Statute sources pack (sources.md) | manan | 09-10 | [ ] |
 | PRIV-006 Manual privacy walkthrough checklist | manan | 09-15 | [ ] |
 | UX-001 Usability testing protocol + icon/voice review | neel | 09-15 | [ ] |
@@ -122,7 +122,7 @@ git switch <your-name>            # your branch only, never main
 | QA-001 Synthetic data generator (1000 personnel, 90d) | neel | 09-12 | [ ] |
 | QA-002 Scripted demo persona data | neel | 09-13 | [ ] |
 | QA-003 E2E test execution + coverage report | neel | 09-16 | [ ] |
-| QA-004 Demo rehearsal checklist + video fallback | kv | 09-17 | [ ] |
+| QA-004 Demo rehearsal checklist + video fallback | kv | 09-17 | [x] |
 | QA-005 Docs QA sweep (stamps + links) | tejas | 09-09 | [ ] |
 | QA-006 Run manual test checklist, record pass/fail | tejas | 09-17 | [ ] |
 | QA-007 Demo rehearsal support + record fallback video | tejas | 09-18 | [ ] |
@@ -138,8 +138,8 @@ git switch <your-name>            # your branch only, never main
 | PM-001 Daily board sync + checklist regeneration | kv | daily | [~] |
 | PM-002 Internal round readiness check | kv | 09-18 | [ ] |
 | PM-003 Portal submission package (PDF, title, description) | kv | 09-19 | [ ] |
-| PM-004 Mentor feedback incorporation board (R2) | kv | 09-26 | [ ] |
-| PM-005 Finale 36h plan + 3-min demo script | kv | 11-15 | [ ] |
+| PM-004 Mentor feedback incorporation board (R2) | kv | 09-26 | [x] |
+| PM-005 Finale 36h plan + 3-min demo script | kv | 11-15 | [x] |
 
 ### Allotment summary
 

@@ -1,6 +1,6 @@
 # DPDP Act 2023 — Obligation Mapping
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] current (PRIV-001 audit vs backend v1) · Last updated: 2026-09-08
 
 ## Framing
 
@@ -24,14 +24,14 @@ Status legend: `[x]` decided / implemented in v1 scope · `[~]` in progress · `
 
 | # | Obligation (cite) | Mechanism in SAARTHI | Where implemented | Status |
 |---|---|---|---|---|
-| 1 | **§4(a) + §6(1)** — consent as ground; consent limited to data necessary for the specified purpose | Unbundled consent artefacts: each bundle = data categories + purpose string + retention note. No bundle-all option. | [F02](../features/F02-jawan-app.md) · [F08](../features/F08-privacy-safety-architecture.md) | [~] |
-| 2 | **§5** — itemised notice; availability in the languages of the Eighth Schedule | The consent sheet **is** the notice: per-bundle itemisation, plain Hindi + English at v1 | [F02](../features/F02-jawan-app.md) · [design.md](../architecture/design/design.md) §8 | [~] |
-| 3 | **§6(2)–(4)** — withdrawal anytime, as easy as giving; prior processing stays lawful | Withdrawal at the same tap depth as giving; **silent** propagation so withdrawal can never become a command signal | [F08](../features/F08-privacy-safety-architecture.md) §3 | [~] |
-| 4 | **§7(i) read with §7(d)** — legitimate use for employment-scope data | HR ingestion runs on this basis; the basis split is stored in ingestion config; the app never asks consent for HR signals | [F01](../features/F01-hr-signal-engine.md) | [~] |
+| 1 | **§4(a) + §6(1)** — consent as ground; consent limited to data necessary for the specified purpose | Unbundled consent artefacts: each bundle = data categories + purpose string + retention note. No bundle-all option. | [F02](../features/F02-jawan-app.md) · [F08](../features/F08-privacy-safety-architecture.md) · `POST /app/consent` | [x] API; app UI is APP-004 (neel) |
+| 2 | **§5** — itemised notice; availability in the languages of the Eighth Schedule | The consent sheet **is** the notice: per-bundle itemisation, plain Hindi + English at v1 | [F02](../features/F02-jawan-app.md) · [design.md](../architecture/design/design.md) §8 · `GET /i18n/{lang}` | [x] keys in `backend/app/i18n.py`; UI copy APP-004 |
+| 3 | **§6(2)–(4)** — withdrawal anytime, as easy as giving; prior processing stays lawful | Withdrawal at the same tap depth as giving; **silent** propagation so withdrawal can never become a command signal | [F08](../features/F08-privacy-safety-architecture.md) §3 · `POST /app/consent/withdraw` | [x] tested (`test_silent_withdrawal`) |
+| 4 | **§7(i) read with §7(d)** — legitimate use for employment-scope data | HR ingestion runs on this basis; the basis split is stored in ingestion config; the app never asks consent for HR signals | [F01](../features/F01-hr-signal-engine.md) · `/ingest/hr/*` | [x] |
 | 5 | **§8(1)** — security safeguards proportionate to risk | TLS 1.3 in transit, AES-256-GCM at rest, pseudonymization, RBAC + ABAC, append-only hash-chained audit | [security-model.md](security-model.md) · [rbac-matrix.md](rbac-matrix.md) | [~] |
 | 6 | **§8(4)** — notify the Board and each affected Data Principal of a breach | Breach runbook with a 72-hour clock (DPDP Rules, draft 2025 — confirm against final rules); subject notification reuses the who-viewed channel | [security-model.md](security-model.md) §breach | [ ] runbook to author |
-| 7 | **§8(6)–(7)** — erasure on withdrawal / purpose expiry, statutory-retention carve-outs aside | 90-day auto-expiry of raw self-reports (only the derived trend persists); erasure pipeline on consent withdrawal | [F08](../features/F08-privacy-safety-architecture.md) §lifecycle | [~] |
-| 8 | **§8 (data-protection-by-design duties)** | The welfare firewall is architectural, not contractual — the route layer refuses, it does not hide | [ADR-0003](../architecture/decisions/0003-two-tier-output-k-anonymity.md) | [~] |
+| 7 | **§8(6)–(7)** — erasure on withdrawal / purpose expiry, statutory-retention carve-outs aside | 90-day auto-expiry of raw self-reports (only the derived trend persists); erasure pipeline on consent withdrawal | [F08](../features/F08-privacy-safety-architecture.md) §lifecycle · `POST /jobs/expire-raw` | [x] job + tests; F02 UI still pending |
+| 8 | **§8 (data-protection-by-design duties)** | The welfare firewall is architectural, not contractual — the route layer refuses, it does not hide | [ADR-0003](../architecture/decisions/0003-two-tier-output-k-anonymity.md) · `CommanderFirewallMiddleware` | [x] route + middleware + tests |
 | 9 | **§8 (accuracy duties)** — completeness, accuracy, consistency | HR signals sourced from the HRMS of record; self-reports are the subject's own words, never silently "corrected"; per-person baselines avoid stale-population drift | [F04](../features/F04-risk-rules-engine.md) | [~] |
 | 10 | **§10** — Significant Data Fiduciary duties (DPO, independent data auditor, periodic due diligence / DPIA) | As-if-SDF posture from day one — see §SDF posture below | this doc | [ ] |
 | 11 | **§11–§13** — access, correction / erasure, grievance | Own 90-day trend view + export (access); self-report edits are versioned; in-app grievance routes to the DPO | [F02](../features/F02-jawan-app.md) | [~] |
@@ -84,3 +84,22 @@ Fields: `consent_id` · `principal_pseudonym` · `bundle_id` · `purpose_string`
 - [!] Session-note retention — counsellor records sit outside the 90-day self-report TTL; needs DPO + MHA-professional input ([mental-healthcare-act-2017.md](mental-healthcare-act-2017.md)).
 - [ ] Consent-manager interplay: a force environment has no consumer consent-manager equivalent — the CRPF welfare cell plays that role; record it in the incident runbook ([security-model.md](security-model.md)).
 - [ ] Multilingual notice expansion: Hindi + English at v1; further Eighth Schedule languages land as data files, not redesigns ([F02](../features/F02-jawan-app.md) · [design.md](../architecture/design/design.md) §8).
+
+## PRIV-001 — implementation audit (2026-09-08)
+
+Audit of this map against `backend/` v1. Not legal advice; clause texts still to be checked against the Gazette (open item above).
+
+| Obligation | Code path | Test | Gap |
+|---|---|---|---|
+| Consent artefacts §4/§6 | `ConsentArtefact` + `POST /app/consent` (unbundled `bundle_id`) | `test_silent_withdrawal` | Jawan UI is APP-004 (neel) |
+| Silent withdrawal §6(2) | `withdraw_all`; scoring skips voluntary sources; commander aggregates have no consent field | `test_silent_withdrawal` | none on API |
+| §7(i) HR basis | `/ingest/hr/*` does not check consent | ingest tests | none |
+| Firewall §8 by-design | middleware + handler `forbid_commander` + trap `GET /welfare/personnel/{id}` | `test_firewall.py` TC-401/403 | none |
+| Dual-key + purpose string | `POST /privacy/unmask` requires live consent + vocabulary purpose | `test_dual_key_requires_two_distinct_principals` | none |
+| 90-day TTL §8(6) | `POST /jobs/expire-raw` purges raw check-ins/instruments; `risk_score` kept | `test_raw_expiry_keeps_trend` | scheduled cron not wired (admin-triggered in v1) |
+| Who-viewed / access §11 | `GET /app/who-viewed` slices the hash-chained audit log | `test_who_viewed_after_counsellor_read` | none |
+| Audit integrity | triggers reject UPDATE/DELETE; `GET /audit/verify` | `test_audit_append_only_and_chain` | AES-256 at rest is a deployment control (security-model), not app-layer |
+| Breach 72h §8(4) | **not implemented as a pager workflow** | — | still `[ ]` — reuse who-viewed channel; runbook in security-model (neel) |
+| SDF / DPO §10 | posture documented; no DPO named in software | — | organisational, not a code gap |
+
+**Verdict:** v1 backend meets the engineering reading of rows 1, 3, 4, 7, 8, 11 (API), 13. Rows 6 and 10 remain organisational. Life-event signals V1–V3 stay feature-flagged **off** (`SAARTHI_LIFE_EVENTS_ENABLED=false`) pending this same sign-off.

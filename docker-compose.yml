@@ -1,0 +1,12 @@
+services:
+  api:
+    image: python:3.11-slim
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    command: bash -lc "pip install -r requirements.txt -q && python -m app.seed && uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    ports:
+      - "8000:8000"
+    environment:
+      SAARTHI_DATABASE_URL: sqlite:////app/saarthi.db
+    # Air-gap friendly: no cloud services. Swap SAARTHI_DATABASE_URL for Postgres when available.
