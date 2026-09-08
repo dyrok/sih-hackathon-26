@@ -5,9 +5,9 @@
 
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **QA-005** · Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv · due 2026-09-09
-- [ ] **QA-006** · Run the manual test checklist from docs/quality/test-plan.md (guided by neel); record pass/fail per case · due 2026-09-17 ← needs QA-003
-- [ ] **QA-007** · Demo rehearsal support + record the fallback video with risa · due 2026-09-18 ← needs QA-004
+- [X] **QA-005** · Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv · due 2026-09-09
+- [X] **QA-006** · Run the manual test checklist from docs/quality/test-plan.md (guided by neel); record pass/fail per case · due 2026-09-17 ← needs QA-003
+- [X] **QA-007** · Demo rehearsal support + record the fallback video with risa · due 2026-09-18 ← needs QA-004
 
 ## Definition of done (every task)
 - [ ] PR with `[TASK-ID]` title merged · tests green
