@@ -29,13 +29,14 @@
 
 ```
 1. Read this file (AGENTS.md)
-2. Read executable/<your-member>/plan-for-<name>.md      → your role + tasks
-3. Read executable/<your-member>/execute.md              → your execution prompt
-4. Read executable/<your-member>/checklist.md            → generated task list with dates
-5. Read docs/README.md → the feature doc for each task    → the "brain" for your work
-6. Work on your own git branch (branch name = your name)
-7. PR title starts with task ID · docs updated in same PR · **notify kv · only kv merges to main**
-8. Run: python3 executable/tools/sync-checklists.py       (kv runs this daily)
+2. Read global_instructions.md                          → master roadmap + complete work checklist + global rules
+3. Read executable/<your-member>/plan-for-<name>.md      → your role + tasks
+4. Read executable/<your-member>/execute.md              → your execution prompt
+5. Read executable/<your-member>/checklist.md            → generated task list with dates
+6. Read docs/README.md → the feature doc for each task    → the "brain" for your work
+7. Work on your own git branch (branch name = your name)
+8. PR title starts with task ID · docs updated in same PR · **notify kv · only kv merges to main**
+9. Run: python3 executable/tools/sync-checklists.py       (kv runs this daily)
 ```
 
 ## Commands (conventions — verify against package.json before running)

@@ -2,7 +2,7 @@
 
 > Owner: kv · Status: [x] current · Last updated: 2026-09-05
 >
-> This folder tells every team member (and their AI agents) how to execute work. The **brain** lives in [`docs/`](../docs/README.md) — every task here links to a doc there.
+> This folder tells every team member (and their AI agents) how to execute work. The **brain** lives in [`docs/`](../docs/README.md) — every task here links to a doc there. The **master roadmap + complete work progress checklist** lives in [`global_instructions.md`](../global_instructions.md) (§5).
 
 ## The rules (memorize these)
 
