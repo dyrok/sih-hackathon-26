@@ -1,6 +1,6 @@
 # Checklist — kv
 
-> Auto-generated from [board.md](../board.md) on 2026-09-08 22:57
+> Auto-generated from [board.md](../board.md) on 2026-09-08 23:09
 > Edit status in board.md, not here.
 
 ## Phase 0 — Documentation brain (2026-09-05 → 09-08)
@@ -43,8 +43,8 @@
 - [x] **QA-004** · Demo rehearsal checklist + recorded video fallback · due 2026-09-17 ← needs QA-003
 ## Phase 3 — Submission & hardening (2026-09-18 → ongoing)
 
-- [~] **PM-002** · Internal round readiness check (deck+demo+repo) · due 2026-09-18 ← needs DECK-001, QA-004
-- [~] **PM-003** · Portal submission package (PDF, title, description) · due 2026-09-19 ← needs PM-002
+- [x] **PM-002** · Internal round readiness check (deck+demo+repo) · due 2026-09-18 ← needs DECK-001, QA-004
+- [x] **PM-003** · Portal submission package (PDF, title, description) · due 2026-09-19 ← needs PM-002
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
 - [x] **ML-004** · ML v2 data-collection plan from counsellor labels · due 2026-09-25 ← needs ML-002

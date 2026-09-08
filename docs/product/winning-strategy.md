@@ -1,6 +1,6 @@
 # Winning Strategy — SIH 2026, PS 26186
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] current · Last updated: 2026-09-08
 > Distilled from [research-sih-2026.md](research-sih-2026.md) (official Guidelines + Evaluation Guideline PDFs, winner accounts). This is the team's working strategy — the raw research stays the source of truth.
 
 ## 1. How SIH scores us (official rubric)

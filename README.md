@@ -9,7 +9,20 @@ Working name **SAARTHI** (सारथी — the charioteer who guides). Proble
 
 - **[`docs/`](docs/README.md) — THE BRAIN.** Product, architecture, per-feature specs, compliance, explanations, quality.
 - **[`executable/`](executable/README.md) — THE HANDS.** Per-member plans, AI-agent execution prompts, task board, rules.
+- **[`backend/`](backend/README.md) — THE CORE API.** FastAPI: ingest, rules engine, interventions, k-anonymity, dual-key unmask.
 - [`AGENTS.md`](AGENTS.md) — rules every AI agent (and human) working here must follow.
+
+## Run the prototype (backend)
+
+```bash
+cd backend
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+python -m app.seed
+uvicorn app.main:app --reload --port 8000
+```
+
+Open http://127.0.0.1:8000/docs. Every demo user password: `saarthi` (`jawan.demo`, `counsellor.a`, `welfare.a`, `commander.3bn`). Commander lookups of a person return **403** — that is the demo.
 
 ## Team
 
