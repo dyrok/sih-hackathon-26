@@ -46,14 +46,14 @@ git switch <your-name>            # your branch only, never main
 
 > Per-task live status: [board.md](executable/board.md). kv mirrors status into this checklist at each daily sync (PM-001) and ticks phase gates when the gate criteria are met. Legend: `[ ]` todo · `[~]` in-progress · `[x]` done.
 
-### Progress snapshot: 17 / 66 tasks complete (26%) — kv backend on branch `kv` pending neel review
+### Progress snapshot: 33 / 66 tasks complete (50%)
 
 | Phase | Window | Tasks | Done | Gate status |
 |---|---|---|---|---|
 | 0 — Docs brain | Sep 5–8 | 16 | 16 | [x] every doc has owner + stamp |
-| 1 — Prototype v1 | Sep 8–15 | 19 | 0 | [~] backend demo loop on branch `kv` (not merged) |
-| 2 — Theory, QA, demo package | Sep 9–19 | 26 | 1 | [ ] deck PDF + video + rehearsal done |
-| 3 — Submission & hardening | Sep 18 → | 5 | 0 | [ ] portal submission before 20 Sep |
+| 1 — Prototype v1 | Sep 8–15 | 19 | 9 | [~] backend demo loop merged; apps still neel |
+| 2 — Theory, QA, demo package | Sep 9–19 | 26 | 5 | [ ] deck PDF + video + rehearsal done |
+| 3 — Submission & hardening | Sep 18 → | 5 | 2 | [ ] portal submission before 20 Sep |
 
 ### Phase 0 — Documentation brain (2026-09-05 → 09-08) — COMPLETE
 
