@@ -1,6 +1,6 @@
 # Mental Healthcare Act 2017 — System Mapping
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] current (PRIV-004 §23 review vs backend v1) · Last updated: 2026-09-08
 
 ## Where the Act reaches (and where it stops)
 
@@ -75,6 +75,22 @@ A disclosure without a live consent artefact fails at the first hop; a disclosur
 - [!] Session-note retention is a counsellor-record decision — deliberately **excluded** from the 90-day self-report TTL; needs DPO + MHA-professional input.
 - [ ] Review the notification copy shown when a §23(1) public-safety break-glass occurs — oversight board owns the wording.
 - [ ] Confirm the professional-registration requirements for counsellors onboarded to the console (out of system scope, but the runbook must reference it).
-- [ ] Negative tests for §23 behaviours (no consent → no disclosure; withdrawal stops further disclosure) recorded in [test-plan.md](../quality/test-plan.md).
+- [x] Negative tests for §23 behaviours (no consent → no disclosure; withdrawal stops further disclosure) live in `backend/tests/test_privacy.py` (also listed in [test-plan.md](../quality/test-plan.md) TC-401/405/407).
+
+## PRIV-004 — §23 compliance review (2026-09-08)
+
+Review of the engineering reading of **Mental Healthcare Act 2017 §23** against the v1 API. Not legal advice; Central Mental Health Authority §23(3) guidelines are not yet notified (still an open item).
+
+| §23 requirement | Backend mechanism | Evidence | Residual risk |
+|---|---|---|---|
+| No disclosure of mental-health-adjacent info without consent §23(1) | Unmask requires a live `ConsentArtefact`; counsellor sees **pseudonyms** without it; identity is a second hop | `POST /privacy/unmask` 403 without consent | Counsellor can still see a **score** on a pseudonym (duty of care / HR-legitimate-use triangulation). Raw journal is not in v1 counsellor payload. |
+| Disclosure only to the care professional | Commander has **no** individual endpoint (ADR-0003). Admin has no read grant on DT-01–04. | `test_firewall.py`, `test_admin_cannot_read_individual_signals` | A DB superuser is a deployment control (security-model), not an API hole. |
+| Right to refuse / stop further disclosure §23(2) | Silent withdrawal nulls voluntary sources on the next score; masking cannot fire on nulls; commander views have no consent column | `test_silent_withdrawal`, `test_masking_suppressed_after_withdrawal` | Open cases continue as duty of care on **HR** signals only (F05) — documented, not a leak of voluntary data. |
+| Public-safety exception stays narrow | Break-glass: counsellor only, 24 h, auto-notify subject + welfare, oversight flag. Admin cannot trigger. | `test_break_glass_notifies_subject` | Copy of the in-app notification is i18n keys, not yet counsellor-legal-reviewed. |
+| No diagnosis, no "mentally ill" label | Tiers are care states (`green/amber/red/critical`); instruments carry `instr.not_diagnosis` | i18n + F04 | Console UI (F06, neel) must not relabel. |
+| Tele-MANAS handoff stores logistics, never session content | `telemanas_referral.outcome_status` enum only; API returns `clinical_content: null` | `test_queue_and_telemanas_and_outcome` | none |
+| Weapon / duty restriction not automated | No endpoint revokes arming; roster proposals are load numbers | F08 weapon-access protocol | Operational letter stays out of band. |
+
+**Verdict:** §23 is met as a pipeline invariant in v1 for the hops we own (API + audit + firewall). Session-note retention remains `[!]` — excluded from the 90-day TTL, needs DPO + MHA-professional input. §23(3) guidelines, once notified, override anything weaker here.
 
 **Disclaimer:** engineering compliance mapping, not legal advice. Sections are cited for traceability; paraphrases are not quotations.

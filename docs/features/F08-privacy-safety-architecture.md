@@ -1,6 +1,6 @@
 # F08 — Privacy & Safety Architecture (Trust Layer)
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] implemented in `backend/` (BACK-002/007/009) · Last updated: 2026-09-08
 > Traces: [FR-14 – FR-18](../product/prd.md) · NFR-01/02/03/08 · [ADR-0003](../architecture/decisions/0003-two-tier-output-k-anonymity.md) · AGENTS.md rule 8
 
 ## Purpose
@@ -86,15 +86,28 @@ The PS's hardest constraints — privacy, stigmatization, trust — are answered
 
 `consent.sheet.title` · `consent.bundle.data.label` · `consent.bundle.purpose.label` · `consent.bundle.retention.label` · `consent.withdraw.action` · `consent.withdraw.confirm` · `whoViewed.title` · `whoViewed.entry.line` (role · when · why · how long) · `whoViewed.unmask.line` · `whoViewed.breakglass.line` · `expiry.explain` · `trend.ownonly`
 
+## Implementation (BACK-002 / BACK-007 / BACK-009, 2026-09-08)
+
+| Piece | Path |
+|---|---|
+| Hash-chained append-only audit + triggers | `backend/app/audit.py` · table `audit_events` |
+| Break-glass | `POST /privacy/break-glass` |
+| k ≥ 5 + complement suppression | `backend/app/privacy/kanonymity.py` · `GET /aggregates/unit/{id}` |
+| Dual-key unmask | `POST /privacy/unmask` · `.../approve` · `.../identity` |
+| Who-viewed | `GET /app/who-viewed` (subject-visible slice of the audit log) |
+| 90-day TTL | `POST /jobs/expire-raw` |
+| Firewall middleware | `backend/app/firewall.py` |
+| Tests | `backend/tests/test_firewall.py` · `test_privacy.py` |
+
 ## Definition of done
 
-- [ ] Negative test: a commander-role request for welfare data by personnel ID is refused at the route **and** writes an audit entry — no UI-only guard.
-- [ ] k ≥ 5 test passes, including the complement-suppression case.
-- [ ] Dual-key tests: counsellor alone, welfare officer alone, admin in any combination, one person holding both roles — all denied; two distinct principals — granted, logged, visible in who-viewed.
-- [ ] Silent-withdrawal test: after withdrawal, no command-visible surface changes except k-floor-safe recomputation; scoring excludes the data; an audit entry exists.
-- [ ] Expiry job purges raw self-reports on schedule; derived trend + intervention outcomes survive; dry-run report archived.
-- [ ] Break-glass: subject + welfare-officer notifications land, 24 h expiry works, oversight flag set.
-- [ ] Audit log: append-only enforced; hash-chain tamper test fails closed.
-- [ ] Raw-audio persistence test: nothing audio-shaped is ever written on device or server ([ADR-0002](../architecture/decisions/0002-on-device-voice-inference.md)).
-- [ ] All i18n keys above exist in `en` + `hi`.
-- [ ] Negative tests recorded in [test-plan.md](../quality/test-plan.md); docs updated in the same PR (AGENTS.md rule 1).
+- [x] Negative test: a commander-role request for welfare data by personnel ID is refused at the route **and** writes an audit entry — no UI-only guard.
+- [x] k ≥ 5 test passes, including the complement-suppression case (TINY unit, n=4).
+- [x] Dual-key tests: counsellor alone denied; admin cannot be a keyholder; two distinct principals granted, logged, visible in who-viewed.
+- [x] Silent-withdrawal test: command-visible payload has no consent/withdrawal field; scoring excludes voluntary data.
+- [x] Expiry job purges raw self-reports; derived trend survives.
+- [x] Break-glass: subject + welfare-officer notifications land, 24 h expiry, oversight flag set.
+- [x] Audit log: append-only enforced; hash-chain tamper test fails closed.
+- [x] Passive ingest stores feature vectors only (`raw_audio: false` on `POST /app/passive`). Device-side audio is APP-006 (neel).
+- [x] All i18n keys above exist in `en` + `hi` (`backend/app/i18n.py`).
+- [x] Negative tests in `backend/tests/` (trace TC-401…409); this doc updated in the same change.

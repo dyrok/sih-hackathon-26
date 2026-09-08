@@ -1,6 +1,6 @@
 # Design — HR Signal Engine (F01)
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] implemented · Last updated: 2026-09-08
 > Implements [F01](../../features/F01-hr-signal-engine.md) · Stack per [ADR-0006](../decisions/0006-tech-stack.md): Python 3.11+, FastAPI, PostgreSQL · Related: [design-risk-engine.md](design-risk-engine.md) (consumer)
 
 ## 1. Module breakdown (`backend/`)

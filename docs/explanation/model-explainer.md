@@ -1,6 +1,6 @@
 # Model Explainer — Risk Engine v1 and the ML v2 Roadmap
 
-> Owner: kv · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: kv · Status: [x] current · Last updated: 2026-09-08
 > Diátaxis: explanation ("why it works"), not how-to. The full rule table and threshold values live in [F04](../features/F04-risk-rules-engine.md); this page explains the reasoning behind them.
 
 ## 1. Why rules v1, not ML — owning the zero-labels position
@@ -41,7 +41,7 @@ Deviations that feed the score: consecutive duty days vs the person's own norm, 
 - Output maps to the intervention ladder Green → Amber → Red → Critical (FR-09), capacity-aware triage (FR-10), [F05](../features/F05-intervention-engine.md).
 - Voice/prosody features enter weighted **low** — unvalidated in this population ([ADR-0002](../architecture/decisions/0002-on-device-voice-inference.md)).
 - Group trauma exposure (a unit casualty/incident) auto-flags the whole exposed group, never individuals (FR-08).
-- Full rule table with clinical citations: [F04](../features/F04-risk-rules-engine.md) · backtest harness on synthetic data: task ML-002.
+- Full rule table with clinical citations: [F04](../features/F04-risk-rules-engine.md) · backtest harness: `python -m app.ml.harness` (ML-002, seed DEMO-PERSONA-01). Fairness checklist: [fairness-audit-checklist.md](fairness-audit-checklist.md). v2 labels: [ml-v2-data-collection-plan.md](ml-v2-data-collection-plan.md).
 
 ## 5. The v2 roadmap — same problem, now with labels
 

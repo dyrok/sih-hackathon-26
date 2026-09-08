@@ -14,5 +14,20 @@ coverage/
 .env
 .env.*
 
+# python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+*.egg-info/
+.coverage
+htmlcov/
+*.db
+backend/saarthi.db
+backend/ml_runs/
+docs/product/submission/node_modules/
+
 # OS
 .DS_Store
