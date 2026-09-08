@@ -87,7 +87,7 @@
 | ID | Task | Owner | Depends on | Due | Status |
 |---|---|---|---|---|---|
 | PM-001 | Daily board sync + checklist regeneration | kv | — | daily | [~] |
-| PM-002 | Internal round readiness check (deck+demo+repo) | kv | DECK-001, QA-004 | 2026-09-18 | [~] |
-| PM-003 | Portal submission package (PDF, title, description) | kv | PM-002 | 2026-09-19 | [~] |
+| PM-002 | Internal round readiness check (deck+demo+repo) | kv | DECK-001, QA-004 | 2026-09-18 | [x] |
+| PM-003 | Portal submission package (PDF, title, description) | kv | PM-002 | 2026-09-19 | [x] |
 | PM-004 | Mentor feedback incorporation board (Round 2 criteria) | kv | PM-003 | 2026-09-26 | [x] |
 | PM-005 | Finale 36h execution plan + 3-min demo script | kv | PM-004 | 2026-11-15 | [x] |

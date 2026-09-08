@@ -15,8 +15,8 @@
 | [personas.md](product/personas.md) | neel | [~] | Jawan, counsellor, welfare officer, commander, evaluator |
 | [adoption-strategy.md](product/adoption-strategy.md) | neel | [~] | "Police wala kyu use karega" — the answer |
 | [impact-and-metrics.md](product/impact-and-metrics.md) | neel | [~] | Pilot KPIs, honest impact framing |
-| [winning-strategy.md](product/winning-strategy.md) | kv | [~] | SIH rubric-mapped jury strategy |
-| [submission-package.md](product/submission-package.md) | kv | [~] | PM-003 portal title + description |
+| [winning-strategy.md](product/winning-strategy.md) | kv | [x] | SIH rubric-mapped jury strategy |
+| [submission-package.md](product/submission-package.md) | kv | [x] | PM-003 portal title, description, PDF |
 | [research-sih-2026.md](product/research-sih-2026.md) | kv | [x] | Raw research: judging criteria, rounds, tactics (source material) |
 
 ## Architecture — how
@@ -70,7 +70,7 @@
 |---|---|---|---|
 | [test-plan.md](quality/test-plan.md) | neel | [~] | TC-### traceable to every FR/NFR |
 | [demo-runbook.md](quality/demo-runbook.md) | kv | [x] | 3-min script, seeded data, fallbacks, QA-004 |
-| [internal-round-readiness.md](quality/internal-round-readiness.md) | kv | [~] | PM-002 go/no-go |
+| [internal-round-readiness.md](quality/internal-round-readiness.md) | kv | [x] | PM-002 go/no-go |
 | [finale-36h-plan.md](quality/finale-36h-plan.md) | kv | [x] | PM-005 hour plan |
 | [usability-testing.md](quality/usability-testing.md) | neel | [~] | Mixed-literacy, offline, low-end device protocol |
 

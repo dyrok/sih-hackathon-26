@@ -27,6 +27,7 @@ htmlcov/
 *.db
 backend/saarthi.db
 backend/ml_runs/
+docs/product/submission/node_modules/
 
 # OS
 .DS_Store

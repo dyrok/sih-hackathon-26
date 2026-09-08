@@ -46,14 +46,14 @@ git switch <your-name>            # your branch only, never main
 
 > Per-task live status: [board.md](executable/board.md). kv mirrors status into this checklist at each daily sync (PM-001) and ticks phase gates when the gate criteria are met. Legend: `[ ]` todo · `[~]` in-progress · `[x]` done.
 
-### Progress snapshot: 33 / 66 tasks complete (50%)
+### Progress snapshot: 35 / 66 tasks complete (53%)
 
 | Phase | Window | Tasks | Done | Gate status |
 |---|---|---|---|---|
 | 0 — Docs brain | Sep 5–8 | 16 | 16 | [x] every doc has owner + stamp |
 | 1 — Prototype v1 | Sep 8–15 | 19 | 9 | [~] backend demo loop merged; apps still neel |
-| 2 — Theory, QA, demo package | Sep 9–19 | 26 | 5 | [ ] deck PDF + video + rehearsal done |
-| 3 — Submission & hardening | Sep 18 → | 5 | 2 | [ ] portal submission before 20 Sep |
+| 2 — Theory, QA, demo package | Sep 9–19 | 26 | 5 | [ ] official-template deck + video still risa/tejas |
+| 3 — Submission & hardening | Sep 18 → | 5 | 4 | [~] content PDF ready; official template + letter remain |
 
 ### Phase 0 — Documentation brain (2026-09-05 → 09-08) — COMPLETE
 
@@ -136,8 +136,8 @@ git switch <your-name>            # your branch only, never main
 | Task | Owner | Due | Status |
 |---|---|---|---|
 | PM-001 Daily board sync + checklist regeneration | kv | daily | [~] |
-| PM-002 Internal round readiness check | kv | 09-18 | [ ] |
-| PM-003 Portal submission package (PDF, title, description) | kv | 09-19 | [ ] |
+| PM-002 Internal round readiness check | kv | 09-18 | [x] |
+| PM-003 Portal submission package (PDF, title, description) | kv | 09-19 | [x] |
 | PM-004 Mentor feedback incorporation board (R2) | kv | 09-26 | [x] |
 | PM-005 Finale 36h plan + 3-min demo script | kv | 11-15 | [x] |
 
