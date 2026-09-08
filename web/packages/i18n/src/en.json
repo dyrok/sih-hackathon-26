@@ -22,6 +22,7 @@
   "home.card.grievance": "Grievance",
   "home.card.welfare": "Family welfare schemes",
   "checkin.title": "How was today?",
+  "checkin.error.mood": "Pick how today felt first",
   "checkin.emoji.1": "Very heavy",
   "checkin.emoji.2": "Heavy",
   "checkin.emoji.3": "Okay",

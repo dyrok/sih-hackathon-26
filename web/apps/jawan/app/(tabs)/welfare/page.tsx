@@ -13,9 +13,9 @@ export default function WelfarePage() {
   const { t } = useT();
   return (
     <>
-      <h2 className="section-title" style={{ marginTop: 0 }}>
+      <h1 className="section-title" style={{ marginTop: 0 }}>
         {t("nav.welfare")}
-      </h2>
+      </h1>
       {ITEMS.map(({ key, icon: Icon }) => (
         <div className="list-row" key={key}>
           <span className="list-row__label">

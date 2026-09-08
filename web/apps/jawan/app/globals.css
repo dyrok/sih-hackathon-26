@@ -158,24 +158,28 @@ body {
   margin-top: var(--sa-space-2);
 }
 
-/* --- Check-in sheet --- */
-.sheet-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgb(47 51 44 / 0.4);
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  z-index: 40;
-}
-
+/* --- Check-in sheet (native <dialog>) --- */
 .sheet {
   width: min(100%, 430px);
   background: var(--sa-color-surface-raised);
+  border: none;
   border-radius: 16px 16px 0 0;
   padding: var(--sa-space-2) var(--sa-space-2) calc(var(--sa-space-2) + env(safe-area-inset-bottom, 0px));
   max-height: 92dvh;
+  max-width: 100%;
   overflow-y: auto;
+  margin: auto 0 0;
+}
+
+.sheet::backdrop {
+  background: rgb(47 51 44 / 0.4);
+}
+
+.sheet__error {
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-state-amber);
+  margin: 0 0 var(--sa-space-1);
 }
 
 .sheet__title {
@@ -219,7 +223,7 @@ body {
 
 .emoji-btn__label {
   font-family: var(--sa-font-sans);
-  font-size: 10px;
+  font-size: var(--sa-type-xs);
   color: var(--sa-color-ink-secondary);
 }
 

@@ -29,6 +29,9 @@ export default function RosterPage() {
 
   return (
     <>
+      <h1 className="section-title" style={{ marginTop: 0 }}>
+        {t("nav.roster")}
+      </h1>
       <CheckInCard onOpen={() => setSheetOpen(true)} checkedInToday={checkedToday} />
 
       <h2 className="section-title">{t("home.section.services")}</h2>

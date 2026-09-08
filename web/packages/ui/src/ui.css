@@ -9,7 +9,11 @@
   border: none;
   cursor: pointer;
   font-weight: 600;
-  transition: opacity 120ms ease-out;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sa-btn {
+    transition: opacity 120ms ease-out;
+  }
 }
 .sa-btn:focus-visible {
   outline: 2px solid var(--sa-color-accent-saffron);
