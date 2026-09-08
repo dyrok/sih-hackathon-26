@@ -1,12 +1,12 @@
 # Checklist — manan
 
-> Auto-generated from [board.md](../board.md) on 2026-09-08 23:09
+> Auto-generated from [board.md](../board.md) on 2026-09-09 00:02
 > Edit status in board.md, not here.
 
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **PRIV-005** · Statute sources pack: copy official text of DPDP §7(i), §4–5 and MHCA §23 with source links into docs/compliance/sources.md · due 2026-09-10 ← needs DOCS-005
-- [ ] **PRIV-006** · Manual privacy walkthrough: simple click-through checklist (consent, withdrawal, who-viewed) once the app builds; record pass/fail · due 2026-09-15 ← needs APP-004
+- [x] **PRIV-005** · Statute sources pack: copy official text of DPDP §7(i), §4–5 and MHCA §23 with source links into docs/compliance/sources.md · due 2026-09-10 ← needs DOCS-005
+- [!] APP-004/neel **PRIV-006** · Manual privacy walkthrough: simple click-through checklist (consent, withdrawal, who-viewed) once the app builds; record pass/fail · due 2026-09-15 ← needs APP-004
 
 ## Definition of done (every task)
 - [ ] PR with `[TASK-ID]` title merged · tests green

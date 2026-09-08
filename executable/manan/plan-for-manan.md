@@ -1,6 +1,6 @@
 # Plan — manan (Compliance research assistant · 1st year)
 
-> Branch: `manan` · Last updated: 2026-09-05 · Buddy: kv (anything unclear → ask kv)
+> Branch: `manan` · Last updated: 2026-09-08 · Buddy: kv (anything unclear → ask kv)
 
 ## My role
 I help with the **compliance side** — simple, guided tasks: collecting the exact legal text with sources, and later clicking through the app to verify the privacy flows work. The complex compliance docs are split between the seniors (DPDP/privacy-law mapping: kv; security model and RBAC matrix: neel) — I learn from them and support them.

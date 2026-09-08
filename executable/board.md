@@ -65,8 +65,8 @@
 | PRIV-002 | RBAC enforcement tests | neel | BACK-001 | 2026-09-14 | [ ] |
 | PRIV-003 | Security test cases + threat model walkthrough | neel | DOCS-005 | 2026-09-15 | [ ] |
 | PRIV-004 | MHCA 2017 section 23 compliance review | kv | DOCS-005 | 2026-09-16 | [x] |
-| PRIV-005 | Statute sources pack: copy official text of DPDP §7(i), §4–5 and MHCA §23 with source links into docs/compliance/sources.md | manan | DOCS-005 | 2026-09-10 | [ ] |
-| PRIV-006 | Manual privacy walkthrough: simple click-through checklist (consent, withdrawal, who-viewed) once the app builds; record pass/fail | manan | APP-004 | 2026-09-15 | [ ] |
+| PRIV-005 | Statute sources pack: copy official text of DPDP §7(i), §4–5 and MHCA §23 with source links into docs/compliance/sources.md | manan | DOCS-005 | 2026-09-10 | [x] |
+| PRIV-006 | Manual privacy walkthrough: simple click-through checklist (consent, withdrawal, who-viewed) once the app builds; record pass/fail | manan | APP-004 | 2026-09-15 | [!] APP-004/neel |
 | UX-001 | Usability testing protocol + icon/voice review | neel | DOCS-015 | 2026-09-15 | [ ] |
 | UX-002 | Figma mockups: check-in + privacy panel | neel | DOCS-004 | 2026-09-14 | [ ] |
 | UX-003 | Collect + caption prototype screenshots for the deck (guided by neel) | risa | QA-002 | 2026-09-16 | [ ] |
