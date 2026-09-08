@@ -1,11 +1,11 @@
 # Checklist — tejas
 
-> Auto-generated from [board.md](../board.md) on 2026-09-08 23:09
+> Auto-generated from [board.md](../board.md) on 2026-09-09 00:29
 > Edit status in board.md, not here.
 
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **QA-005** · Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv · due 2026-09-09
+- [~] **QA-005** · Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv · due 2026-09-09
 - [ ] **QA-006** · Run the manual test checklist from docs/quality/test-plan.md (guided by neel); record pass/fail per case · due 2026-09-17 ← needs QA-003
 - [ ] **QA-007** · Demo rehearsal support + record the fallback video with risa · due 2026-09-18 ← needs QA-004
 
