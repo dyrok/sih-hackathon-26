@@ -63,6 +63,7 @@ _ALLOWED_FLAGS = {
     "night_duty",
     "admin_backlog",
     "short_sleep",
+    "long_pauses",
     "llm",
 }
 
@@ -74,8 +75,8 @@ Rules:
 - tone_label: exactly calm, strained, or flat.
 - mood_label: exactly light, steady, or heavy.
 - mood_score: integer 1-9, higher is lighter. Do not invent a percentage.
-- wellness_summary: one or two sentences, private to the officer, not a diagnosis, not a unit score.
-- flags: subset of fatigue_language, incident_load, night_duty, admin_backlog, short_sleep.
+- wellness_summary: one or two sentences, private to the officer, not a diagnosis, not a unit score. If pause_count is 3 or more, mention the pauses in plain language (count and silent seconds) — do not invent a percentage.
+- flags: subset of fatigue_language, incident_load, night_duty, admin_backlog, short_sleep, long_pauses.
 - questions: 1-2 ids from hours, sleep, incident, leave, tomorrow.
 Never name another person. Never produce a command-facing risk score."""
 
@@ -135,6 +136,8 @@ def analyze_with_llm(
     *,
     rms_mean: float | None = None,
     rms_var: float | None = None,
+    pause_count: int | None = None,
+    pause_total: float | None = None,
     answers: list[dict] | None = None,
     fallback: dict,
 ) -> dict | None:
@@ -146,7 +149,12 @@ def analyze_with_llm(
         return None
     payload = {
         "transcript": transcript,
-        "voice_energy": {"rms_mean": rms_mean, "rms_var": rms_var},
+        "voice_energy": {
+            "rms_mean": rms_mean,
+            "rms_var": rms_var,
+            "pause_count": pause_count,
+            "pause_total": pause_total,
+        },
         "officer_answers": answers or [],
     }
     models = [settings.openrouter_model]
@@ -203,6 +211,8 @@ def analyze(
     *,
     rms_mean: float | None = None,
     rms_var: float | None = None,
+    pause_count: int | None = None,
+    pause_total: float | None = None,
     answers: list[dict] | None = None,
     use_llm: bool = False,
 ) -> dict:
@@ -257,6 +267,13 @@ def analyze(
         "strained": "The last stretch sounded heavier than the start. Private note only.",
         "flat": "Delivery was flat — often just fatigue. Private note only.",
     }[tone]
+    if pause_count is not None and pause_count >= 3:
+        flags.append("long_pauses")
+        silent = pause_total if pause_total is not None else 0
+        wellness = (
+            "You paused %d times (%.1f s silent). Private note only — this is not a unit score."
+            % (pause_count, silent)
+        )
     if "short_sleep" in flags:
         wellness = "Short sleep flagged from your own answers. Private note only."
 
@@ -276,6 +293,8 @@ def analyze(
             transcript,
             rms_mean=rms_mean,
             rms_var=rms_var,
+            pause_count=pause_count,
+            pause_total=pause_total,
             answers=answers,
             fallback=heuristic,
         )

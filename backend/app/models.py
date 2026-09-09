@@ -561,6 +561,8 @@ class DutySitrep(Base):
     wellness_summary = Column(Text, nullable=False)
     flags = Column(JSON, nullable=False)
     duration_s = Column(Float, nullable=True)
+    pause_count = Column(Integer, nullable=True)
+    pause_total = Column(Float, nullable=True)
     created_at = Column(DateTime, nullable=False)
 
 

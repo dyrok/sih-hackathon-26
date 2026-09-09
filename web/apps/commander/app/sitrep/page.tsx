@@ -28,6 +28,33 @@ const QUESTION_KEYS: Record<string, string> = {
 
 type Phase = "idle" | "recording" | "questions" | "saving" | "done";
 
+/** Same floors as F03 VoiceCapture — a pause is an interior silence ≥ 250 ms. */
+const VOICED_RMS = 0.012;
+const PAUSE_MS = 250;
+
+function pausesFromRms(frames: { t: number; rms: number }[]): { pause_count: number; pause_total: number } {
+  let pauseCount = 0;
+  let pauseTotal = 0;
+  let runStart: number | null = null;
+  let heardVoice = false;
+  for (const frame of frames) {
+    if (frame.rms >= VOICED_RMS) {
+      if (runStart !== null && heardVoice) {
+        const length = frame.t - runStart;
+        if (length >= PAUSE_MS) {
+          pauseCount += 1;
+          pauseTotal += length / 1000;
+        }
+      }
+      runStart = null;
+      heardVoice = true;
+    } else if (runStart === null) {
+      runStart = frame.t;
+    }
+  }
+  return { pause_count: pauseCount, pause_total: Number(pauseTotal.toFixed(1)) };
+}
+
 function pickQuestionIds(text: string): string[] {
   const blob = text.toLowerCase();
   const out: string[] = [];
@@ -58,7 +85,7 @@ function variance(values: number[]): number {
 
 export default function SitrepPage() {
   const { t } = useT();
-  const history = useApi(() => getOwnSitreps(14), [], { cacheKey: "commander.own.sitreps" });
+  const history = useApi(() => getOwnSitreps(90), [], { cacheKey: "commander.own.sitreps" });
 
   const [phase, setPhase] = useState<Phase>("idle");
   const [live, setLive] = useState("");
@@ -69,11 +96,13 @@ export default function SitrepPage() {
   const [answers, setAnswers] = useState<{ id: string; answer: string }[]>([]);
   const [report, setReport] = useState<Sitrep | null>(null);
   const [error, setError] = useState(false);
+  const [emptyCapture, setEmptyCapture] = useState(false);
   const [micDenied, setMicDenied] = useState(false);
 
   const recRef = useRef<{ stop: () => void } | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const rmsRef = useRef<number[]>([]);
+  const rmsRef = useRef<{ t: number; rms: number }[]>([]);
+  const pauseRef = useRef({ pause_count: 0, pause_total: 0 });
   const startedAt = useRef(0);
 
   useEffect(() => {
@@ -83,28 +112,33 @@ export default function SitrepPage() {
     };
   }, []);
 
-  const finishTranscript = (text: string, rms: number[]) => {
+  const finishTranscript = (text: string, frames: { t: number; rms: number }[]) => {
     const cleaned = text.replace(/\s+/g, " ").trim();
     if (cleaned.length < 8) {
-      setError(true);
+      setEmptyCapture(true);
       setPhase("idle");
       return;
     }
+    setEmptyCapture(false);
     setFinalText(cleaned);
     setQuestionIds(pickQuestionIds(cleaned));
     setQIndex(0);
     setAnswer("");
     setAnswers([]);
     setPhase("questions");
-    rmsRef.current = rms;
+    rmsRef.current = frames;
+    pauseRef.current = pausesFromRms(frames);
   };
 
   const startMic = async () => {
     setError(false);
+    setEmptyCapture(false);
     setLive("");
     setReport(null);
     rmsRef.current = [];
+    pauseRef.current = { pause_count: 0, pause_total: 0 };
     startedAt.current = Date.now();
+    const t0 = performance.now();
 
     const w = window as unknown as {
       SpeechRecognition?: new () => SpeechRec;
@@ -133,7 +167,7 @@ export default function SitrepPage() {
           const sample = buf[i] ?? 0;
           acc += sample * sample;
         }
-        rmsRef.current.push(Math.sqrt(acc / buf.length));
+        rmsRef.current.push({ t: performance.now() - t0, rms: Math.sqrt(acc / buf.length) });
         raf = requestAnimationFrame(tick);
       };
       raf = requestAnimationFrame(tick);
@@ -174,26 +208,32 @@ export default function SitrepPage() {
     recRef.current?.stop();
     recRef.current = null;
     const text = live;
-    const rms = rmsRef.current.slice();
-    finishTranscript(text, rms);
+    finishTranscript(text, rmsRef.current.slice());
   };
 
-  const useSample = () => {
-    setLive(SAMPLE);
-    setMicDenied(false);
-    finishTranscript(SAMPLE, [0.03, 0.04, 0.02, 0.05, 0.06]);
+  const sampleFrames = () => {
+    const frames: { t: number; rms: number }[] = [];
+    for (let t = 0; t < 20000; t += 16) {
+      const inPause = [1800, 4200, 8100, 12000, 16100].some((p) => t >= p && t < p + 700);
+      frames.push({ t, rms: inPause ? 0.002 : 0.04 });
+    }
+    return frames;
   };
 
-  const submitAnswers = async (all: { id: string; answer: string }[]) => {
+  const fileLog = async (transcript: string, all: { id: string; answer: string }[]) => {
     setPhase("saving");
     setError(false);
-    const rms = rmsRef.current;
+    const rms = rmsRef.current.map((f) => f.rms);
+    const pauses = pauseRef.current;
+    const elapsed = startedAt.current ? (Date.now() - startedAt.current) / 1000 : 22;
     try {
       const saved = await submitOwnSitrep({
-        transcript: finalText,
-        duration_s: Math.max(1, (Date.now() - startedAt.current) / 1000),
+        transcript,
+        duration_s: Math.min(180, Math.max(1, elapsed)),
         rms_mean: mean(rms) || 0.03,
         rms_var: variance(rms) || 0.005,
+        pause_count: pauses.pause_count,
+        pause_total: pauses.pause_total,
         answers: all,
       });
       setReport(saved);
@@ -201,8 +241,28 @@ export default function SitrepPage() {
       history.reload();
     } catch {
       setError(true);
-      setPhase("questions");
+      setPhase("idle");
     }
+  };
+
+  const useSample = () => {
+    const frames = sampleFrames();
+    setLive(SAMPLE);
+    setMicDenied(false);
+    setEmptyCapture(false);
+    setError(false);
+    startedAt.current = Date.now() - 22_000;
+    rmsRef.current = frames;
+    pauseRef.current = pausesFromRms(frames);
+    setFinalText(SAMPLE);
+    void fileLog(SAMPLE, [
+      { id: "hours", answer: "About twelve hours on the feet." },
+      { id: "sleep", answer: "Short night — four hours." },
+    ]);
+  };
+
+  const submitAnswers = async (all: { id: string; answer: string }[]) => {
+    await fileLog(finalText, all);
   };
 
   const nextQuestion = () => {
@@ -244,6 +304,7 @@ export default function SitrepPage() {
             </Button>
           </div>
           {micDenied ? <p className="cmd-sitrep__hint">{t("sitrep.micDenied")}</p> : null}
+          {emptyCapture ? <p className="cmd-sitrep__hint">{t("sitrep.empty")}</p> : null}
         </section>
       ) : null}
 
@@ -285,6 +346,14 @@ export default function SitrepPage() {
             <p>
               {t("sitrep.well.mood")}: {t(`sitrep.mood.${report.mood_label}`)}
             </p>
+            <p>
+              {(report.pause_count ?? 0) > 0
+                ? t("sitrep.well.pauses", {
+                    count: report.pause_count ?? 0,
+                    seconds: Number(report.pause_total ?? 0).toFixed(1),
+                  })
+                : t("sitrep.well.pauses.none")}
+            </p>
             <p>{report.wellness_summary}</p>
             <p className="cmd-sitrep__hint">
               {t(report.heuristic ? "sitrep.well.heuristic" : "sitrep.well.laguna")}
@@ -296,10 +365,13 @@ export default function SitrepPage() {
         </div>
       ) : null}
 
-      {error ? <Toast messageKey="common.error" onDismiss={() => setError(false)} timeoutMs={4000} /> : null}
+      {error ? <Toast messageKey="sitrep.saveFailed" onDismiss={() => setError(false)} timeoutMs={6000} /> : null}
 
       <section className="cmd-sitrep__history">
         <h2>{t("sitrep.history")}</h2>
+        {rows.length > 0 ? (
+          <p className="cmd-sitrep__hint">{t("sitrep.history.count", { n: rows.length })}</p>
+        ) : null}
         {history.loading && !rows.length ? <Skeleton /> : null}
         {!history.loading && !rows.length ? <p>{t("common.empty")}</p> : null}
         <ol className="cmd-sitrep__list">
@@ -307,6 +379,14 @@ export default function SitrepPage() {
             <li key={row.id}>
               <strong>{row.duty_date}</strong>
               <span>{row.work_summary}</span>
+              {(row.pause_count ?? 0) > 0 ? (
+                <span className="cmd-sitrep__hint">
+                  {t("sitrep.well.pauses", {
+                    count: row.pause_count ?? 0,
+                    seconds: Number(row.pause_total ?? 0).toFixed(1),
+                  })}
+                </span>
+              ) : null}
             </li>
           ))}
         </ol>

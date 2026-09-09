@@ -378,76 +378,149 @@ def seed_demo(db: Session, score: bool = True) -> None:
     db.flush()
 
 
-#: Canned duty logs for the commander walkthrough. No welfare identity of
-#: another person appears here — these are the CO's own words.
-_SITREP_DAYS = (
+#: Rotating duty-log templates for the commander walkthrough. No other
+#: person's identity appears here — these are the CO's own words.
+_SITREP_TEMPLATES = (
     (
-        6,
         "Morning inspection of the lines at 0530. Parade and PT until 0700, all present. Two sections on the eastern fence 0900 to 1400, no incident. Afternoon with the JCOs on the leave backlog. Evening briefing at 1800. Long day. Will walk the perimeter once more at 2100.",
         0.031,
         0.006,
+        5,
+        4.2,
     ),
     (
-        5,
         "Night picquet rota posted after a short briefing. The fence is quiet. Sports in the afternoon went well. Leave desk is still slow.",
         0.028,
         0.002,
+        2,
+        1.1,
     ),
     (
-        4,
         "Training day. Range in the morning, classroom in the afternoon. Parade went well. Voice is fine. Early night.",
         0.033,
         0.0015,
+        1,
+        0.4,
     ),
     (
-        3,
         "Sat with the JCOs on leave backlog — six applications still pending from last week. Admin heavier than the ground. Tired by 1900.",
         0.022,
         0.005,
+        6,
+        5.8,
     ),
     (
-        2,
         "Eastern fence inspection 0900 to 1400. No incident. Water point delayed the last loop. Long hours on my feet.",
         0.029,
         0.0045,
+        4,
+        3.6,
     ),
     (
-        1,
-        "Steady morning. Parade, PT, office. Nothing to flag for tomorrow's briefing. Fine.",
+        "Steady morning. Parade, PT, office. Ammunition check clean. Nothing to flag for tomorrow's briefing. Fine.",
         0.03,
         0.001,
+        1,
+        0.3,
+    ),
+    (
+        "Convoy briefing at 0600 then the western track until 1500. Dust, heat, no contact. Voice is going. Tea with the JCOs after stand-down.",
+        0.027,
+        0.0055,
+        7,
+        6.1,
+    ),
+    (
+        "Kit inspection and stores indent. Quarter master is short on batteries again. Quiet ground. Early lights-out.",
+        0.032,
+        0.0018,
+        2,
+        0.9,
+    ),
+    (
+        "Sunday rest for most of the unit. I walked the perimeter twice and signed the leave register. Slow day. Slept better.",
+        0.025,
+        0.0022,
+        3,
+        2.0,
+    ),
+    (
+        "Joint drill with the neighbouring company. Timings slipped on the second loop. After-action in the mess. Long but useful.",
+        0.03,
+        0.004,
+        4,
+        3.1,
     ),
 )
 
 
+def _write_sitrep(db: Session, user_id: str, day, template: tuple) -> None:
+    text, rms_mean, rms_var, pause_count, pause_total = template
+    result = analyze(
+        text,
+        rms_mean=rms_mean,
+        rms_var=rms_var,
+        pause_count=pause_count,
+        pause_total=pause_total,
+    )
+    db.add(
+        DutySitrep(
+            id=nid("sr"),
+            user_id=user_id,
+            duty_date=day,
+            transcript=text,
+            work_summary=result["work_summary"],
+            work_bullets=result["work_bullets"],
+            answers=None,
+            tone_label=result["tone_label"],
+            mood_label=result["mood_label"],
+            mood_score=result["mood_score"],
+            wellness_summary=result["wellness_summary"],
+            flags=result["flags"],
+            duration_s=38.0 + (pause_count or 0),
+            pause_count=pause_count,
+            pause_total=pause_total,
+            created_at=datetime.now(timezone.utc),
+        )
+    )
+
+
 def seed_officer_sitreps(db: Session) -> None:
-    """Dummy sitreps so the duty-log screen is not empty on first open."""
-    if db.query(DutySitrep).first() is not None:
-        return
+    """Fill ~90 days of duty logs so the screen looks lived-in."""
     officer = db.query(User).filter(User.username == "commander.3bn").one_or_none()
     if officer is None:
         return
     today = as_of()
-    for days_ago, text, rms_mean, rms_var in _SITREP_DAYS:
-        result = analyze(text, rms_mean=rms_mean, rms_var=rms_var)
-        db.add(
-            DutySitrep(
-                id=nid("sr"),
-                user_id=officer.id,
-                duty_date=today - timedelta(days=days_ago),
-                transcript=text,
-                work_summary=result["work_summary"],
-                work_bullets=result["work_bullets"],
-                answers=None,
-                tone_label=result["tone_label"],
-                mood_label=result["mood_label"],
-                mood_score=result["mood_score"],
-                wellness_summary=result["wellness_summary"],
-                flags=result["flags"],
-                duration_s=42.0,
-                created_at=datetime.now(timezone.utc),
-            )
-        )
+    have = {
+        row.duty_date
+        for row in db.query(DutySitrep).filter(DutySitrep.user_id == officer.id)
+    }
+    templates = _SITREP_TEMPLATES
+    added = 0
+    for days_ago in range(1, 91):
+        day = today - timedelta(days=days_ago)
+        # Skip a rest day now and then so the log is not a perfect machine.
+        if day.weekday() == 6 and days_ago % 2 == 0:
+            continue
+        if day in have:
+            continue
+        _write_sitrep(db, officer.id, day, templates[days_ago % len(templates)])
+        added += 1
+    tiny = db.query(User).filter(User.username == "commander.tiny").one_or_none()
+    if tiny is not None:
+        tiny_have = {
+            row.duty_date
+            for row in db.query(DutySitrep).filter(DutySitrep.user_id == tiny.id)
+        }
+        for days_ago in range(1, 91):
+            day = today - timedelta(days=days_ago)
+            if day.weekday() == 6 and days_ago % 2 == 0:
+                continue
+            if day in tiny_have:
+                continue
+            _write_sitrep(db, tiny.id, day, templates[(days_ago + 3) % len(templates)])
+    if added:
+        db.flush()
 
 
 def main() -> None:

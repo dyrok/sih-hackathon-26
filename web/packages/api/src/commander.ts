@@ -233,6 +233,8 @@ export type Sitrep = {
   flags: string[];
   answers?: { id: string; answer: string }[] | null;
   duration_s?: number | null;
+  pause_count?: number | null;
+  pause_total?: number | null;
   heuristic: boolean;
   self_scope: boolean;
   questions?: string[];
@@ -244,7 +246,7 @@ export type SitrepList = {
   sitreps: Sitrep[];
 };
 
-export function getOwnSitreps(days = 14): Promise<SitrepList> {
+export function getOwnSitreps(days = 90): Promise<SitrepList> {
   return apiFetch(`/me/sitreps?days=${days}`) as Promise<SitrepList>;
 }
 
@@ -253,6 +255,8 @@ export function submitOwnSitrep(body: {
   duration_s?: number;
   rms_mean?: number;
   rms_var?: number;
+  pause_count?: number;
+  pause_total?: number;
   answers?: { id: string; answer: string }[];
 }): Promise<Sitrep> {
   return apiFetch("/me/sitreps", { method: "POST", body: JSON.stringify(body) }) as Promise<Sitrep>;

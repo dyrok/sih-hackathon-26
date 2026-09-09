@@ -24,10 +24,20 @@ def test_commander_can_file_and_reread_own_sitrep(client):
     r = client.post(
         "/me/sitreps",
         headers=h,
-        json={"transcript": SAMPLE, "duration_s": 28, "rms_mean": 0.03, "rms_var": 0.006},
+        json={
+            "transcript": SAMPLE,
+            "duration_s": 28,
+            "rms_mean": 0.03,
+            "rms_var": 0.006,
+            "pause_count": 5,
+            "pause_total": 4.2,
+        },
     )
     assert r.status_code == 200, r.text
     body = r.json()
+    assert body["self_scope"] is True
+    assert body["pause_count"] == 5
+    assert body["pause_total"] == 4.2
     assert body["self_scope"] is True
     assert body["heuristic"] is True
     assert "work_summary" in body
@@ -39,12 +49,23 @@ def test_commander_can_file_and_reread_own_sitrep(client):
     assert body["id"] in ids
 
 
+def test_huge_duration_from_a_broken_timer_is_clamped_not_rejected(client):
+    h = auth_header(client, "commander.3bn")
+    r = client.post(
+        "/me/sitreps",
+        headers=h,
+        json={"transcript": SAMPLE, "duration_s": 1.7e12, "pause_count": 4, "pause_total": 3.2},
+    )
+    assert r.status_code == 200, r.text
+    assert r.json()["duration_s"] == 180.0
+
+
 def test_seeded_dummy_sitreps_exist_for_the_demo_officer(client):
     h = auth_header(client, "commander.3bn")
-    r = client.get("/me/sitreps", headers=h)
+    r = client.get("/me/sitreps?days=90", headers=h)
     assert r.status_code == 200
     rows = r.json()["sitreps"]
-    assert len(rows) >= 6
+    assert len(rows) >= 40
     joined = " ".join(s["transcript"] for s in rows)
     assert "ps_demo01" not in joined
     assert "Demo Constable" not in joined

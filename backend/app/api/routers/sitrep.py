@@ -10,7 +10,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, Query
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from sqlalchemy.orm import Session
 
 from ...audit import write_audit
@@ -26,11 +26,28 @@ router = APIRouter(tags=["officer-sitrep"])
 
 class SitrepIn(BaseModel):
     transcript: str = Field(min_length=8, max_length=8000)
-    duration_s: float | None = Field(default=None, ge=0, le=180)
+    duration_s: float | None = None
     rms_mean: float | None = None
     rms_var: float | None = None
+    pause_count: int | None = Field(default=None, ge=0, le=200)
+    pause_total: float | None = None
     answers: list[dict] | None = None
     duty_date: str | None = None
+
+    @field_validator("duration_s", "pause_total", mode="before")
+    @classmethod
+    def _clamp_seconds(cls, value):
+        if value is None or value == "":
+            return None
+        try:
+            number = float(value)
+        except (TypeError, ValueError):
+            return None
+        if number < 0:
+            return 0.0
+        if number > 180:
+            return 180.0
+        return number
 
 
 @router.post("/me/sitreps")
@@ -51,6 +68,8 @@ def create_sitrep(
         body.transcript,
         rms_mean=body.rms_mean,
         rms_var=body.rms_var,
+        pause_count=body.pause_count,
+        pause_total=body.pause_total,
         answers=body.answers,
         use_llm=True,
     )
@@ -68,6 +87,8 @@ def create_sitrep(
         wellness_summary=result["wellness_summary"],
         flags=result["flags"],
         duration_s=body.duration_s,
+        pause_count=body.pause_count,
+        pause_total=body.pause_total,
         created_at=datetime.now(timezone.utc),
     )
     db.add(row)
@@ -84,7 +105,7 @@ def create_sitrep(
 
 @router.get("/me/sitreps")
 def list_sitreps(
-    days: int = Query(14, ge=1, le=90),
+    days: int = Query(90, ge=1, le=120),
     db: Session = Depends(get_db),
     user: User = Depends(require_roles("commander")),
 ):
@@ -92,7 +113,7 @@ def list_sitreps(
         db.query(DutySitrep)
         .filter(DutySitrep.user_id == user.id)
         .order_by(DutySitrep.duty_date.desc(), DutySitrep.created_at.desc())
-        .limit(40)
+        .limit(100)
         .all()
     )
     return {
@@ -116,6 +137,8 @@ def _out(row: DutySitrep, questions: list[str] | None = None) -> dict:
         "flags": row.flags or [],
         "answers": row.answers,
         "duration_s": row.duration_s,
+        "pause_count": row.pause_count,
+        "pause_total": row.pause_total,
         "heuristic": "llm" not in (row.flags or []),
         "self_scope": True,
     }

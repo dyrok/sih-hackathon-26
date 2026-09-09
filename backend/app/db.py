@@ -69,12 +69,29 @@ def install_audit_triggers(bind) -> None:
         )
 
 
+def ensure_sitrep_pause_columns(bind) -> None:
+    """SQLite create_all will not ALTER an existing duty_sitreps table."""
+    url = str(bind.url) if hasattr(bind, "url") else ""
+    if "sqlite" not in url:
+        return
+    with bind.begin() as conn:
+        rows = conn.execute(text("PRAGMA table_info(duty_sitreps)")).fetchall()
+        if not rows:
+            return
+        cols = {row[1] for row in rows}
+        if "pause_count" not in cols:
+            conn.execute(text("ALTER TABLE duty_sitreps ADD COLUMN pause_count INTEGER"))
+        if "pause_total" not in cols:
+            conn.execute(text("ALTER TABLE duty_sitreps ADD COLUMN pause_total FLOAT"))
+
+
 def init_db(bind=None) -> None:
     from . import models  # noqa: F401
 
     bind = bind or engine
     Base.metadata.create_all(bind)
     install_audit_triggers(bind)
+    ensure_sitrep_pause_columns(bind)
 
 
 def get_db() -> Generator[Session, None, None]:
