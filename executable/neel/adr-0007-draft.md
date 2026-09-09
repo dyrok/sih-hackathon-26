@@ -1,7 +1,9 @@
 # ADR-0007 (DRAFT — for kv to review/commit) — Web-first client apps: no native binaries
 
-> **Status: PROPOSED — kv owns `docs/architecture/decisions/`, so this draft sits here until kv commits it as `docs/architecture/decisions/0007-web-first-clients.md`.**
-> Drafted: neel, 2026-09-08, from the team meeting decision of 2026-09-08.
+> **Status: IMPLEMENTED (still a draft as a document) — the decision below is now live in code: three Next.js apps in `web/` (`apps/jawan`, `apps/counsellor`, `apps/commander`), no Expo or React Native anywhere in the tree, and offline-first carried by a Service Worker app shell plus an IndexedDB outbox. kv owns `docs/architecture/decisions/`, so this file stays here until kv commits it as `docs/architecture/decisions/0007-web-first-clients.md`; until then the *decision* is implemented and the *ADR* is unratified.**
+> Drafted: neel, 2026-09-08, from the team meeting decision of 2026-09-08. Implementation verified against the tree: neel, 2026-09-09.
+>
+> **What changed since drafting:** nothing in the decision — the shipped tree matches this draft as written, plus two additions it did not anticipate: a `packages/instruments` screener bank, and `web/scripts/lint-boundaries.mjs`, which makes the role-isolation and no-individual-shape claims below into build-failing CI checks rather than conventions.
 > Supersedes: the mobile portions of ADR-0005 (offline-first, low-end Android) and ADR-0006 (tech stack — the "Mobile: Expo/React Native" line and the `mobile/` repo layout line). ADR-0004 (roster-first) is unaffected.
 
 ## Context
@@ -20,7 +22,7 @@ All three client surfaces ship as Next.js web apps in one bun-workspace monorepo
 - `web/apps/jawan` — mobile-first installable PWA (the jawan app: roster, check-in, consent, receipts). Offline-first is preserved with a Service Worker app shell + an IndexedDB outbox queue keyed by `client_uuid`.
 - `web/apps/counsellor` — counsellor console.
 - `web/apps/commander` — commander dashboard (aggregates only).
-- Shared packages: `tokens` (design tokens JSON → CSS vars), `i18n` (en/hi dictionaries), `ui`, `sync` (queue engine), `api` (role-scoped typed clients, path-lint-enforced no cross-role imports).
+- Shared packages: `tokens` (design tokens JSON → CSS vars), `i18n` (en/hi dictionaries), `ui`, `sync` (queue engine), `api` (role-scoped typed clients, path-lint-enforced no cross-role imports), and — added during implementation — `instruments` (the validated screener bank).
 
 No Expo/React Native code ships; there is no app-store binary. `data/` (synthetic data generator) is unaffected (Python).
 

@@ -40,16 +40,16 @@
 | BACK-007 | k-anonymity aggregation + dual-key unmask endpoints | kv | BACK-002 | 2026-09-14 | [x] |
 | BACK-008 | Alert dispatch + Tele-MANAS handoff record | kv | BACK-005 | 2026-09-15 | [x] |
 | BACK-009 | who-viewed-my-data logging API | kv | BACK-002 | 2026-09-14 | [x] |
-| APP-001 | Expo app scaffold + SQLite offline sync | neel | DOCS-010 | 2026-09-10 | [~] |
-| APP-002 | Roster/leave/pay-slip screens (roster-app-first) | neel | APP-001 | 2026-09-12 | [ ] |
-| APP-003 | 10-second check-in + instruments + validity items | neel | APP-001 | 2026-09-13 | [ ] |
-| APP-004 | Consent flow + silent withdrawal | neel | APP-001 | 2026-09-13 | [ ] |
-| APP-005 | who-viewed-my-data screen | neel | APP-004 | 2026-09-14 | [ ] |
-| APP-006 | On-device voice prosody module | neel | APP-001 | 2026-09-14 | [ ] |
-| APP-007 | Counsellor console (Next.js) | neel | BACK-005 | 2026-09-14 | [ ] |
-| APP-008 | Commander dashboard: aggregate heatmap + morale index | neel | BACK-007 | 2026-09-15 | [ ] |
-| APP-009 | Anonymous unit pulse + battle-buddy pairing | neel | APP-001 | 2026-09-15 | [ ] |
-| APP-010 | What-if simulator (basic) | neel | APP-008 | 2026-09-16 | [ ] |
+| APP-001 | Expo app scaffold + SQLite offline sync | neel | DOCS-010 | 2026-09-10 | [x] |
+| APP-002 | Roster/leave/pay-slip screens (roster-app-first) | neel | APP-001 | 2026-09-12 | [x] |
+| APP-003 | 10-second check-in + instruments + validity items | neel | APP-001 | 2026-09-13 | [x] |
+| APP-004 | Consent flow + silent withdrawal | neel | APP-001 | 2026-09-13 | [x] |
+| APP-005 | who-viewed-my-data screen | neel | APP-004 | 2026-09-14 | [x] |
+| APP-006 | On-device voice prosody module | neel | APP-001 | 2026-09-14 | [x] |
+| APP-007 | Counsellor console (Next.js) | neel | BACK-005 | 2026-09-14 | [x] |
+| APP-008 | Commander dashboard: aggregate heatmap + morale index | neel | BACK-007 | 2026-09-15 | [x] |
+| APP-009 | Anonymous unit pulse + battle-buddy pairing | neel | APP-001 | 2026-09-15 | [x] |
+| APP-010 | What-if simulator (basic) | neel | APP-008 | 2026-09-16 | [x] |
 
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
@@ -62,17 +62,17 @@
 | ML-005 | Verify every link + citation in datasets-research.md; list dead links for neel | ayush | DOCS-006 | 2026-09-10 | [x] |
 | ML-006 | One-page instrument factsheet (PHQ-9/GAD-7/PSS-10/ISI: items, bands, source) for the deck | ayush | DOCS-006 | 2026-09-11 | [x] |
 | PRIV-001 | DPDP 2023 mapping audit vs implementation | kv | DOCS-005 | 2026-09-13 | [x] |
-| PRIV-002 | RBAC enforcement tests | neel | BACK-001 | 2026-09-14 | [ ] |
-| PRIV-003 | Security test cases + threat model walkthrough | neel | DOCS-005 | 2026-09-15 | [ ] |
+| PRIV-002 | RBAC enforcement tests | neel | BACK-001 | 2026-09-14 | [x] |
+| PRIV-003 | Security test cases + threat model walkthrough | neel | DOCS-005 | 2026-09-15 | [x] |
 | PRIV-004 | MHCA 2017 section 23 compliance review | kv | DOCS-005 | 2026-09-16 | [x] |
 | PRIV-005 | Statute sources pack: copy official text of DPDP §7(i), §4–5 and MHCA §23 with source links into docs/compliance/sources.md | manan | DOCS-005 | 2026-09-10 | [ ] |
 | PRIV-006 | Manual privacy walkthrough: simple click-through checklist (consent, withdrawal, who-viewed) once the app builds; record pass/fail | manan | APP-004 | 2026-09-15 | [ ] |
-| UX-001 | Usability testing protocol + icon/voice review | neel | DOCS-015 | 2026-09-15 | [ ] |
-| UX-002 | Figma mockups: check-in + privacy panel | neel | DOCS-004 | 2026-09-14 | [ ] |
+| UX-001 | Usability testing protocol + icon/voice review | neel | DOCS-015 | 2026-09-15 | [x] |
+| UX-002 | Figma mockups: check-in + privacy panel | neel | DOCS-004 | 2026-09-14 | [x] |
 | UX-003 | Collect + caption prototype screenshots for the deck (guided by neel) | risa | QA-002 | 2026-09-16 | [ ] |
-| QA-001 | Synthetic data generator (1000 personnel, 90 days) | neel | DOCS-013 | 2026-09-12 | [ ] |
-| QA-002 | Scripted demo persona data (Constable, 34, 3rd Bn) | neel | QA-001 | 2026-09-13 | [ ] |
-| QA-003 | E2E test execution + coverage report | neel | QA-002 | 2026-09-16 | [ ] |
+| QA-001 | Synthetic data generator (1000 personnel, 90 days) | neel | DOCS-013 | 2026-09-12 | [x] |
+| QA-002 | Scripted demo persona data (Constable, 34, 3rd Bn) | neel | QA-001 | 2026-09-13 | [x] |
+| QA-003 | E2E test execution + coverage report | neel | QA-002 | 2026-09-16 | [x] |
 | QA-004 | Demo rehearsal checklist + recorded video fallback | kv | QA-003 | 2026-09-17 | [x] |
 | QA-005 | Docs QA sweep: every doc has Owner + Status stamp, links resolve; report gaps to kv | tejas | — | 2026-09-09 | [~] |
 | QA-006 | Run the manual test checklist from docs/quality/test-plan.md (guided by neel); record pass/fail per case | tejas | QA-003 | 2026-09-17 | [~] |

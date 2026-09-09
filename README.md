@@ -10,19 +10,43 @@ Working name **SAARTHI** (सारथी — the charioteer who guides). Proble
 - **[`docs/`](docs/README.md) — THE BRAIN.** Product, architecture, per-feature specs, compliance, explanations, quality.
 - **[`executable/`](executable/README.md) — THE HANDS.** Per-member plans, AI-agent execution prompts, task board, rules.
 - **[`backend/`](backend/README.md) — THE CORE API.** FastAPI: ingest, rules engine, interventions, k-anonymity, dual-key unmask.
+- **[`web/`](web/README.md) — THE THREE SURFACES.** Next.js monorepo: jawan PWA (offline-first), counsellor console, commander dashboard.
+- **[`data/`](data/README.md) — THE FIXTURE.** Deterministic synthetic population: 1,000 personnel x 90 days, one seed, one truth for tests, demo and model evaluation.
 - [`AGENTS.md`](AGENTS.md) — rules every AI agent (and human) working here must follow.
 
-## Run the prototype (backend)
+## Run the prototype
+
+One command sets everything up; `make` on its own lists the rest.
 
 ```bash
-cd backend
-python3 -m venv .venv && source .venv/bin/activate
-pip install -r requirements.txt
-python -m app.seed
-uvicorn app.main:app --reload --port 8000
+make setup          # backend venv + bun workspace
+make seed           # demo persona (Constable, 34, 3rd Bn) + unit background
+make api            # Core API        http://127.0.0.1:8000/docs
+make jawan          # jawan PWA       http://localhost:3100
+make counsellor     # counsellor console  http://localhost:3200
+make commander      # commander dashboard http://localhost:3300
+make demo           # the demo checklist, in running order
 ```
 
-Open http://127.0.0.1:8000/docs. Every demo user password: `saarthi` (`jawan.demo`, `counsellor.a`, `welfare.a`, `commander.3bn`). Commander lookups of a person return **403** — that is the demo.
+Every demo user's password is `saarthi`:
+
+| username | role | what they see |
+|---|---|---|
+| `jawan.demo` | jawan | roster, 10-second check-in, own trend, consent, who-viewed-my-data |
+| `counsellor.a` | counsellor | ranked case queue, evidence, dual-key unmask, notes, outcomes |
+| `welfare.a` | welfare officer | assigned cases, the second unmask key, roster rebalancing |
+| `commander.3bn` | commander | unit aggregates only — heatmap, morale, indicators, what-if, forecast |
+| `admin` · `auditor` · `hr.ingest` | pipeline roles | no individual read grant between them |
+
+A commander asking for one person gets **403 and an audit row the jawan can
+read back**. That is the demo, and `make test` proves it 257 times.
+
+```bash
+make generate       # 1,000 personnel x 90 days of deterministic synthetic data
+make test           # backend + generator + web suites
+make check          # everything CI runs: boundaries, types, tests, build
+make perf           # the NFR-06 performance envelope
+```
 
 ## Team
 
