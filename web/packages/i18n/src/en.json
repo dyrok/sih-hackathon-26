@@ -476,6 +476,7 @@
   "sitrep.tone.flat": "Flat",
   "sitrep.tone.strained": "Strained toward the end",
   "sitrep.well.heuristic": "Demo heuristic from your words and voice energy — not a diagnosis, not a unit score.",
+  "sitrep.well.laguna": "Private note drafted by Laguna from your words and voice energy — not a diagnosis, not a unit score.",
   "sitrep.well.mood": "How the day sat",
   "sitrep.well.private": "Private to you. No screen on this console can show this to anyone else.",
   "sitrep.well.title": "Private wellness note",
