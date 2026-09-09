@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ...clock import as_of
+from ...clock import as_of, clamp_capture_date
 from ...config import get_settings
 from ...consent import has_voluntary_consent
 from ...db import get_db
@@ -41,11 +41,12 @@ class PassiveIn(BaseModel):
 
 
 def _day(raw: str | None):
-    from datetime import date as date_cls
+    """Capture date, clamped to the plausible offline window.
 
-    if not raw:
-        return as_of()
-    return date_cls.fromisoformat(raw[:10])
+    The client value stays useful as a *reported* timestamp for offline sync,
+    but it may never drive retention — see clock.clamp_capture_date.
+    """
+    return clamp_capture_date(raw, as_of())
 
 
 @router.post("/checkins")

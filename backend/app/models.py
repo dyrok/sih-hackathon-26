@@ -77,6 +77,9 @@ class IngestBatch(Base):
     status = Column(String, nullable=False, default="received")
     received_at = Column(DateTime, nullable=False)
     batch_hash = Column(String, nullable=True)
+    #: Who submitted it. Without this the quarantine report is addressable by a
+    #: guessable batch id from any ingest account (TC-424).
+    submitted_by_user_id = Column(String, nullable=True, index=True)
 
 
 class QuarantineRow(Base):
@@ -276,6 +279,10 @@ class RiskScore(Base):
     sources_present = Column(JSON, nullable=False)
     stale = Column(Boolean, nullable=False, default=False)
     hysteresis_held = Column(Boolean, nullable=False, default=False)
+    #: The tier the rules produced BEFORE hysteresis. Without it the downgrade
+    #: counter reads its own held output and can never reach the confirmations
+    #: it is waiting for — a person who recovers stays flagged forever.
+    candidate_tier = Column(String, nullable=True)
 
     factors = relationship("RiskFactor", back_populates="score_row", cascade="all, delete-orphan")
     masking = relationship("MaskingFlag", back_populates="score_row", uselist=False)
@@ -479,3 +486,177 @@ class AuditEvent(Base):
     prev_hash = Column(String, nullable=True)
     entry_hash = Column(String, nullable=False)
     payload = Column(JSON, nullable=True)
+
+
+# ---------------------------------------------------------------------------
+# Client-surface tables (neel — APP-003/005/006/007/008/009/010).
+# Additive only: nothing above this line changes. Every table below is either
+# self-scoped (subject == token principal) or unit-scoped and k-filtered before
+# it leaves the API (ADR-0003).
+# ---------------------------------------------------------------------------
+
+
+class UnitPulseRating(Base):
+    """FR-19 anonymous unit pulse. Stored per principal ONLY to enforce
+    one-rating-per-facet-per-period; no read path exposes the pseudonym."""
+
+    __tablename__ = "unit_pulse_rating"
+    __table_args__ = (
+        UniqueConstraint("pseudonym_id", "period", "facet", name="uq_pulse_once"),
+        Index("ix_pulse_unit_period", "unit_id", "period"),
+    )
+
+    id = Column(String, primary_key=True)
+    pseudonym_id = Column(String, nullable=False, index=True)
+    unit_id = Column(String, nullable=False)
+    period = Column(String, nullable=False)  # ISO week, e.g. 2026-W36
+    facet = Column(String, nullable=False)  # leadership | fairness | family | facilities
+    rating = Column(Integer, nullable=False)  # 1..5
+    recorded_at = Column(Date, nullable=False)
+
+
+class BuddyPair(Base):
+    """F02 screen 7 — battle buddy. Command sees neither side of any pairing."""
+
+    __tablename__ = "buddy_pair"
+    __table_args__ = (UniqueConstraint("a_pseudonym", "b_pseudonym", name="uq_buddy_pair"),)
+
+    id = Column(String, primary_key=True)
+    a_pseudonym = Column(String, nullable=False, index=True)
+    b_pseudonym = Column(String, nullable=False, index=True)
+    created_at = Column(DateTime, nullable=False)
+    ended_at = Column(DateTime, nullable=True)
+
+
+class BuddyState(Base):
+    """Coarse state only — ok | quiet | sos. Never a score, never a tier."""
+
+    __tablename__ = "buddy_state"
+
+    pseudonym_id = Column(String, primary_key=True)
+    state = Column(String, nullable=False, default="ok")
+    updated_at = Column(DateTime, nullable=False)
+
+
+class DutySitrep(Base):
+    """Officer's own daily duty log (voice sitrep). Self-scope only.
+
+    The transcript is a *work* artefact the officer chose to file. Tone and
+    mood fields are a private heuristic for that same officer — they are never
+    joined into unit aggregates and there is no subject selector on the route.
+    """
+
+    __tablename__ = "duty_sitreps"
+
+    id = Column(String, primary_key=True)
+    user_id = Column(String, nullable=False, index=True)
+    duty_date = Column(Date, nullable=False, index=True)
+    transcript = Column(Text, nullable=False)
+    work_summary = Column(Text, nullable=False)
+    work_bullets = Column(JSON, nullable=False)
+    answers = Column(JSON, nullable=True)
+    tone_label = Column(String, nullable=False)
+    mood_label = Column(String, nullable=False)
+    mood_score = Column(Integer, nullable=False)
+    wellness_summary = Column(Text, nullable=False)
+    flags = Column(JSON, nullable=False)
+    duration_s = Column(Float, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+
+
+class VoiceFeature(Base):
+    """F03 / ADR-0002 — prosody feature vector only. There is deliberately no
+    audio, transcript, speaker-embedding or device-fingerprint column here:
+    the exclusion is enforced by schema, not by convention."""
+
+    __tablename__ = "voice_feature"
+
+    id = Column(String, primary_key=True)
+    pseudonym_id = Column(String, nullable=False, index=True)
+    recorded_at = Column(Date, nullable=False)
+    f0_mean = Column(Float, nullable=True)
+    f0_sd = Column(Float, nullable=True)
+    speech_rate = Column(Float, nullable=True)
+    pause_count = Column(Integer, nullable=True)
+    pause_total = Column(Float, nullable=True)
+    voiced_ratio = Column(Float, nullable=True)
+    loudness_var = Column(Float, nullable=True)
+    jitter = Column(Float, nullable=True)
+    shimmer = Column(Float, nullable=True)
+    duration_s = Column(Float, nullable=False)
+    model_version = Column(String, nullable=False)
+    schema_version = Column(String, nullable=False)
+    expires_at = Column(Date, nullable=False)
+    purged = Column(Boolean, nullable=False, default=False)
+
+
+class SessionNote(Base):
+    """F06 screen 4 — confidential counsellor record (MHCA 2017 §23).
+    Never exportable into any appraisal flow; not an ML label input (ADR-0001)."""
+
+    __tablename__ = "session_note"
+
+    id = Column(String, primary_key=True)
+    case_id = Column(String, ForeignKey("response_case.id"), nullable=False, index=True)
+    author_user_id = Column(String, nullable=False)
+    session_at = Column(DateTime, nullable=False)
+    modality = Column(String, nullable=False)  # in_person | tele | telemanas
+    themes = Column(JSON, nullable=False)
+    risk_reestimate = Column(Integer, nullable=True)  # 0..100, counsellor's own
+    free_text = Column(Text, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+
+
+class SimulationRun(Base):
+    """F07 screen 4 — what-if. Unit IDs exclusively: a scenario object can never
+    carry a person. Assumptions are snapshotted so a projection is auditable."""
+
+    __tablename__ = "simulation_run"
+
+    id = Column(String, primary_key=True)
+    unit_id = Column(String, nullable=False, index=True)
+    scenario_params = Column(JSON, nullable=False)
+    projected_deltas = Column(JSON, nullable=False)
+    assumption_snapshot = Column(JSON, nullable=False)
+    created_by_role = Column(String, nullable=False)
+    created_at = Column(DateTime, nullable=False)
+    expires_at = Column(DateTime, nullable=True)
+
+
+class SyncReceipt(Base):
+    """Idempotency ledger for the offline outbox (ADR-0005 / TC-603).
+
+    One row per (principal, client_uuid) the server has already accepted. A
+    retry after a lost response finds its receipt and is reported ``duplicate``
+    instead of writing a second row. The uuid is a device-scoped random value
+    and carries no PII — it exists only so retries are safe.
+    """
+
+    __tablename__ = "sync_receipt"
+    __table_args__ = (UniqueConstraint("pseudonym_id", "client_uuid", name="uq_sync_receipt"),)
+
+    id = Column(String, primary_key=True)
+    pseudonym_id = Column(String, nullable=False, index=True)
+    client_uuid = Column(String, nullable=False, index=True)
+    table_name = Column(String, nullable=False)
+    resource_id = Column(String, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+
+
+class AuditCheckpoint(Base):
+    """External anchor for the audit chain (TC-443).
+
+    A hash chain proves that no entry was *edited*, but not that none was
+    *removed from the end* — a truncated chain is still internally consistent.
+    This single row records the head hash and the entry count outside the log
+    itself, so deleting the tail leaves the checkpoint disagreeing with the
+    table. It is exported with the audit bundle, which is what makes it an
+    anchor rather than one more row for the same DBA to edit.
+    """
+
+    __tablename__ = "audit_checkpoint"
+
+    id = Column(Integer, primary_key=True)
+    entry_count = Column(Integer, nullable=False, default=0)
+    head_hash = Column(String, nullable=True)
+    updated_at = Column(DateTime, nullable=False)

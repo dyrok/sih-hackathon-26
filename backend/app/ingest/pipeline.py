@@ -57,6 +57,7 @@ def ingest_rows(
     rows: list[dict],
     source: str,
     recompute: bool = True,
+    submitted_by_user_id: str | None = None,
 ) -> dict[str, Any]:
     if dataset not in SCHEMA_BY_DATASET:
         raise ValueError(f"unknown dataset {dataset}")
@@ -83,6 +84,7 @@ def ingest_rows(
         status="staging",
         received_at=now,
         batch_hash=_row_hash(rows),
+        submitted_by_user_id=submitted_by_user_id,
     )
     if existing is None:
         db.add(batch)
@@ -90,6 +92,8 @@ def ingest_rows(
     else:
         batch.rows_in = len(rows)
         batch.batch_hash = _row_hash(rows)
+        if batch.submitted_by_user_id is None:
+            batch.submitted_by_user_id = submitted_by_user_id
 
     written = 0
     quarantined = 0

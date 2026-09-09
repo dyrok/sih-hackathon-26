@@ -1,0 +1,9 @@
+{
+  "name": "@saarthi/instruments",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Validated screener bank (PHQ-9, GAD-7, PSS-10, ISI) with licence + adaptation status. Zero invented items.",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

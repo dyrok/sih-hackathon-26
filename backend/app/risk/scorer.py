@@ -110,6 +110,14 @@ def _previous_tier(db: Session, pid: str, as_of: date) -> str | None:
 
 
 def _downgrade_confirmations(db: Session, pid: str, previous: str, as_of: date) -> int:
+    """How many consecutive recent cycles the *rules* said "lower than this".
+
+    Counts the pre-hysteresis candidate, not the published tier. Counting the
+    published tier is circular: hysteresis holds the old tier, the hold is
+    stored, the next cycle reads the hold as evidence that nothing improved, and
+    the person never comes down however much their signals recover. That is the
+    opposite of welfare — the arc has to be able to close (F09 days 75-90).
+    """
     rows = (
         db.query(RiskScore)
         .filter(RiskScore.pseudonym_id == pid, RiskScore.as_of < as_of)
@@ -119,7 +127,8 @@ def _downgrade_confirmations(db: Session, pid: str, previous: str, as_of: date) 
     )
     n = 0
     for r in rows:
-        if TIER_ORDER.index(r.tier) < TIER_ORDER.index(previous):
+        observed = r.candidate_tier or r.tier
+        if TIER_ORDER.index(observed) < TIER_ORDER.index(previous):
             n += 1
         else:
             break
@@ -235,7 +244,7 @@ def score_person(db: Session, pid: str, as_of: date | None = None, emit_case: bo
     previous = _previous_tier(db, pid, as_of)
     needed = int(ruleset.get("hysteresis", {}).get("downgrade_confirmations", 2))
     confs = _downgrade_confirmations(db, pid, previous, as_of) if previous else 0
-    held = False
+    raw_candidate = candidate
     candidate, held = apply_hysteresis(previous, candidate, confs, needed)
 
     now = datetime.now(timezone.utc).replace(tzinfo=None)
@@ -252,6 +261,7 @@ def score_person(db: Session, pid: str, as_of: date | None = None, emit_case: bo
         sources_present=sources,
         stale=False,
         hysteresis_held=held,
+        candidate_tier=raw_candidate,
     )
     db.add(row)
     db.flush()

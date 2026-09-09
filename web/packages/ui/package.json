@@ -1,0 +1,21 @@
+{
+  "name": "@saarthi/ui",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SAARTHI shared UI components — CheckInCard, SyncPill, care-state chips, tabs, buttons",
+  "exports": {
+    ".": "./src/index.ts",
+    "./ui.css": "./src/ui.css"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "react": "^19.1.0"
+  },
+  "dependencies": {
+    "@saarthi/i18n": "workspace:*",
+    "@saarthi/sync": "workspace:*"
+  }
+}

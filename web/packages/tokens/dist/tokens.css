@@ -1,0 +1,49 @@
+/* AUTO-GENERATED from src/tokens.json — do not edit by hand.
+   First declaration = hex fallback (older Android browsers), second = OKLCH. */
+:root {
+  --sa-color-surface-base: #f7f6f2;
+  --sa-color-surface-base: oklch(0.97 0.004 100);
+  --sa-color-surface-raised: #ffffff;
+  --sa-color-surface-raised: oklch(1 0 0);
+  --sa-color-ink-primary: #2f332c;
+  --sa-color-ink-primary: oklch(0.25 0.02 140);
+  --sa-color-ink-secondary: #61635a;
+  --sa-color-ink-secondary: oklch(0.45 0.02 140);
+  --sa-color-brand-olive: #5a6b33;
+  --sa-color-brand-olive: oklch(0.45 0.07 130);
+  --sa-color-brand-olive-soft: #ecefe0;
+  --sa-color-brand-olive-soft: oklch(0.93 0.02 130);
+  --sa-color-accent-saffron: #d98a1e;
+  --sa-color-accent-saffron: oklch(0.72 0.14 70);
+  --sa-color-accent-saffron-ink: #2f332c;
+  --sa-color-accent-saffron-ink: oklch(0.25 0.02 140);
+  --sa-color-state-green: #4a8a55;
+  --sa-color-state-green: oklch(0.62 0.13 150);
+  --sa-color-state-amber: #e0a020;
+  --sa-color-state-amber: oklch(0.75 0.14 80);
+  --sa-color-state-red: #c04535;
+  --sa-color-state-red: oklch(0.55 0.17 25);
+  --sa-color-state-critical: #8f2f25;
+  --sa-color-state-critical: oklch(0.45 0.15 25);
+  --sa-color-state-ink-green: #3e7447;
+  --sa-color-state-ink-green: oklch(0.54 0.11 150);
+  --sa-color-state-ink-amber: #8e6514;
+  --sa-color-state-ink-amber: oklch(0.51 0.10 80);
+  --sa-color-state-ink-red: #b64232;
+  --sa-color-state-ink-red: oklch(0.53 0.16 25);
+  --sa-color-state-ink-critical: #8f2f25;
+  --sa-color-state-ink-critical: oklch(0.45 0.15 25);
+  --sa-color-focus: #bd781a;
+  --sa-color-focus: oklch(0.65 0.13 70);
+  --sa-space-1: 4px;
+  --sa-space-2: 16px;
+  --sa-space-3: 36px;
+  --sa-type-xs: 12px;
+  --sa-type-sm: 16px;
+  --sa-type-md: 21px;
+  --sa-type-lg: 27px;
+  --sa-type-xl: 35px;
+  --sa-line-height: 1.5;
+  --sa-line-height-hi: 1.6;
+  --sa-font-sans: "Noto Sans", "Noto Sans Devanagari", system-ui, sans-serif;
+}

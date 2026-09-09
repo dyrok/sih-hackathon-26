@@ -1,6 +1,6 @@
 # Checklist — neel
 
-> Auto-generated from [board.md](../board.md) on 2026-09-09 00:29
+> Auto-generated from [board.md](../board.md) on 2026-09-09 10:32
 > Edit status in board.md, not here.
 
 ## Phase 0 — Documentation brain (2026-09-05 → 09-08)
@@ -10,41 +10,41 @@
 - [x] **DOCS-015** · usability-testing.md (review + own) · due 2026-09-09 ← needs DOCS-004
 ## Phase 1 — Prototype v1 (2026-09-08 → 09-15)
 
-- [ ] **APP-001** · Expo app scaffold + SQLite offline sync · due 2026-09-10 ← needs DOCS-010
-- [ ] **APP-002** · Roster/leave/pay-slip screens (roster-app-first) · due 2026-09-12 ← needs APP-001
+- [x] **APP-001** · Expo app scaffold + SQLite offline sync · due 2026-09-10 ← needs DOCS-010
+- [x] **APP-002** · Roster/leave/pay-slip screens (roster-app-first) · due 2026-09-12 ← needs APP-001
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **QA-001** · Synthetic data generator (1000 personnel, 90 days) · due 2026-09-12 ← needs DOCS-013
+- [x] **QA-001** · Synthetic data generator (1000 personnel, 90 days) · due 2026-09-12 ← needs DOCS-013
 ## Phase 1 — Prototype v1 (2026-09-08 → 09-15)
 
-- [ ] **APP-003** · 10-second check-in + instruments + validity items · due 2026-09-13 ← needs APP-001
-- [ ] **APP-004** · Consent flow + silent withdrawal · due 2026-09-13 ← needs APP-001
+- [x] **APP-003** · 10-second check-in + instruments + validity items · due 2026-09-13 ← needs APP-001
+- [x] **APP-004** · Consent flow + silent withdrawal · due 2026-09-13 ← needs APP-001
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **QA-002** · Scripted demo persona data (Constable, 34, 3rd Bn) · due 2026-09-13 ← needs QA-001
+- [x] **QA-002** · Scripted demo persona data (Constable, 34, 3rd Bn) · due 2026-09-13 ← needs QA-001
 ## Phase 1 — Prototype v1 (2026-09-08 → 09-15)
 
-- [ ] **APP-005** · who-viewed-my-data screen · due 2026-09-14 ← needs APP-004
-- [ ] **APP-006** · On-device voice prosody module · due 2026-09-14 ← needs APP-001
-- [ ] **APP-007** · Counsellor console (Next.js) · due 2026-09-14 ← needs BACK-005
+- [x] **APP-005** · who-viewed-my-data screen · due 2026-09-14 ← needs APP-004
+- [x] **APP-006** · On-device voice prosody module · due 2026-09-14 ← needs APP-001
+- [x] **APP-007** · Counsellor console (Next.js) · due 2026-09-14 ← needs BACK-005
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **PRIV-002** · RBAC enforcement tests · due 2026-09-14 ← needs BACK-001
-- [ ] **UX-002** · Figma mockups: check-in + privacy panel · due 2026-09-14 ← needs DOCS-004
+- [x] **PRIV-002** · RBAC enforcement tests · due 2026-09-14 ← needs BACK-001
+- [x] **UX-002** · Figma mockups: check-in + privacy panel · due 2026-09-14 ← needs DOCS-004
 ## Phase 1 — Prototype v1 (2026-09-08 → 09-15)
 
-- [ ] **APP-008** · Commander dashboard: aggregate heatmap + morale index · due 2026-09-15 ← needs BACK-007
-- [ ] **APP-009** · Anonymous unit pulse + battle-buddy pairing · due 2026-09-15 ← needs APP-001
+- [x] **APP-008** · Commander dashboard: aggregate heatmap + morale index · due 2026-09-15 ← needs BACK-007
+- [x] **APP-009** · Anonymous unit pulse + battle-buddy pairing · due 2026-09-15 ← needs APP-001
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **PRIV-003** · Security test cases + threat model walkthrough · due 2026-09-15 ← needs DOCS-005
-- [ ] **UX-001** · Usability testing protocol + icon/voice review · due 2026-09-15 ← needs DOCS-015
+- [x] **PRIV-003** · Security test cases + threat model walkthrough · due 2026-09-15 ← needs DOCS-005
+- [x] **UX-001** · Usability testing protocol + icon/voice review · due 2026-09-15 ← needs DOCS-015
 ## Phase 1 — Prototype v1 (2026-09-08 → 09-15)
 
-- [ ] **APP-010** · What-if simulator (basic) · due 2026-09-16 ← needs APP-008
+- [x] **APP-010** · What-if simulator (basic) · due 2026-09-16 ← needs APP-008
 ## Phase 2 — Theory, QA, demo package (2026-09-09 → 09-19)
 
-- [ ] **QA-003** · E2E test execution + coverage report · due 2026-09-16 ← needs QA-002
+- [x] **QA-003** · E2E test execution + coverage report · due 2026-09-16 ← needs QA-002
 
 ## Definition of done (every task)
 - [ ] PR with `[TASK-ID]` title merged · tests green

@@ -1,0 +1,9 @@
+{
+  "name": "@saarthi/sync",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SAARTHI offline-first sync: IndexedDB queue keyed by client_uuid, idempotent resumable drain",
+  "exports": {
+    ".": "./src/index.ts"
+  }
+}

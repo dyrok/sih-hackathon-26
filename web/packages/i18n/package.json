@@ -1,0 +1,16 @@
+{
+  "name": "@saarthi/i18n",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SAARTHI i18n — en/hi dictionaries + useT() hook. All user-facing strings ship as keys.",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.8",
+    "react": "^19.1.0"
+  }
+}

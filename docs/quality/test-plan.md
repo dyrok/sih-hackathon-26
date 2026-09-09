@@ -1,8 +1,9 @@
 # Test Plan
 
-> Owner: neel · Status: [~] drafting · Last updated: 2026-09-05
+> Owner: neel · Status: [~] drafting · Last updated: 2026-09-09
 
 > Every FR/NFR in [prd.md](../product/prd.md) maps to a test-case ID below. The [ADR-0003](../architecture/decisions/0003-two-tier-output-k-anonymity.md) firewall suite (§4) is a **must-pass gate**: a red case there blocks merge *and* demo.
+> The security expansion of §4 lives in [security-test-cases.md](security-test-cases.md) (TC-410…TC-460) with its threat analysis in [threat-model.md](threat-model.md) — see §9.
 
 ## 1. Test strategy — what v1 must prove
 
@@ -41,18 +42,18 @@ ID scheme `TC-<nnn>` by layer: **1xx** signal · **2xx** inference · **3xx** in
 | FR-17 | Silent consent withdrawal | TC-407 |
 | FR-18 | 90-day raw-data expiry | TC-408 |
 | FR-19 | Anonymous unit pulse (aggregate only) | TC-402 |
-| FR-20 | Synthetic data generator | TC-501…TC-505 |
+| FR-20 | Synthetic data generator | TC-501…TC-504 |
 
 | NFR | Requirement (short) | Test cases |
 |---|---|---|
 | NFR-01 | DPDP 2023: consent artefacts, retention, 72h breach readiness | TC-407, TC-408, TC-409 |
 | NFR-02 | MHA 2017 §23 confidentiality | TC-401, TC-405 |
-| NFR-03 | Server-side RBAC, TLS, AES-256, append-only audit | TC-401, TC-409 |
+| NFR-03 | Server-side RBAC, TLS, AES-256, append-only audit | TC-401, TC-409; token integrity TC-410…TC-415; role escalation TC-416, TC-417; IDOR TC-418…TC-425; firewall layers TC-426…TC-430; platform TC-456…TC-458, TC-460 ([security-test-cases.md](security-test-cases.md)) |
 | NFR-04 | Low-end Android (API 26+), icon-first, hi/en | TC-606, TC-607 |
 | NFR-05 | Explainability (top factors, no black box) | TC-205, TC-803 |
 | NFR-06 | 1,000-personnel recompute < 60 s | TC-701, TC-702 |
 | NFR-07 | False-alarm economics, alert caps | TC-207, TC-302 |
-| NFR-08 | Immutable audit + break-glass notifies subject | TC-409 |
+| NFR-08 | Immutable audit + break-glass notifies subject | TC-409; break-glass TC-437…TC-439; audit chain TC-440…TC-444; receipt completeness TC-459 ([security-test-cases.md](security-test-cases.md)) |
 
 ## 3. Per-feature test cases (given/when/then)
 
@@ -81,6 +82,14 @@ ID scheme `TC-<nnn>` by layer: **1xx** signal · **2xx** inference · **3xx** in
 ## 4. ADR-0003 firewall test suite — MUST-PASS GATE
 
 Run on every PR merge and before every demo. Any failure blocks release — escalate to kv per AGENTS.md rule 8.
+
+> **Gate status 2026-09-09, 02:20 (re-verified): GREEN — all §4 cases pass.**
+>
+> Earlier on 2026-09-09 the PRIV-003 pass recorded TC-402's k ≥ 5 promise as defeated by a differencing attack: `GET /aggregates/unit/3BN` published `n = 12` and `morale_index = 0.917` beside a `suppressed: true` amber cell, from which `amber = 1` was recoverable by arithmetic ([security-test-cases.md](security-test-cases.md) TC-451, [threat-model.md](threat-model.md) THR-17). **That finding was valid when written and has since been fixed in `backend/`.** `aggregate_unit` now withholds `morale_index` and `elevated_share` whenever any contributing cell is suppressed, and publishes only a *count* of suppressed cells rather than naming which tiers they are.
+>
+> Re-verified by execution against a freshly seeded demo fixture: the same request now returns `morale_index: null`, `elevated_share: null`, `suppressed_cells: 2` and no `suppressed_keys` field, so no suppressed cell can be pinned to a named tier. Regression cover is `backend/tests/test_security_hardening.py::test_tc451_*` / `::test_tc452_*`, which run in the standard suite (`110 passed`).
+>
+> **Known residual, not a gate failure:** `n` is still published, so `n − Σ(published cells)` reveals how many people the suppressed tiers hold *between them* (1, on the demo fixture) — but not which tier. That ambiguity is exactly what complement suppression buys, and it is tracked under TC-450b.
 
 - **TC-401** **Route-level rejection** — Given a commander-role JWT, when `GET /welfare/personnel/{id}` is called, then the request is rejected at the route level (403/404). Assert on the role-filtered OpenAPI route list, not on UI hiding.
 - **TC-402** **k-anonymity ≥ 5** — Given every commander-visible aggregate, when rendered, then it asserts ≥ 5 distinct contributors; a crafted 4-person unit produces a suppressed cell.
@@ -119,3 +128,41 @@ Run on every PR merge and before every demo. Any failure blocks release — esca
 - **TC-802** Persona-arc reproduction: harness re-runs the scripted 90-day arc and diffs actual vs scripted flag days (must be zero diff — mirrors ADR-0001's validation clause).
 - **TC-803** v2-readiness probe: counts counsellor-outcome labels accumulated (ADR-0001 human-in-the-loop) and reports when ML v2 training becomes defensible; until then v1 rules stay the product.
 - Harness output lands in this repo's run log; failures open a `[ML-002]` task on the board, not a silent skip.
+
+## 9. Security suite (PRIV-003)
+
+The §4 firewall gate proves the *architecture*. This section adds the adversarial layer: what a hostile principal on each trust boundary can actually do, and the executable case that proves it cannot — or documents that it currently can.
+
+| Doc | What it holds | Owner |
+|---|---|---|
+| [threat-model.md](threat-model.md) | STRIDE walkthrough over six real trust boundaries, a mermaid data-flow diagram, the THR-01…THR-44 threat register with `file:line` for every control, the four discipline-tool abuse cases, and the explicit v1 non-defences | neel |
+| [security-test-cases.md](security-test-cases.md) | TC-410…TC-460 as given/when/then with the exact HTTP request, expected status, and the automated test file that should cover each | neel |
+
+**Numbering.** TC-401…TC-409 stay exactly as written in §4 — nothing is renumbered. TC-406 was never assigned and is left reserved. The security suite runs from TC-410 to TC-460.
+
+**Traceability into §2.** NFR-03 and NFR-08 above now carry the new ids. The mapping by section:
+
+| Suite section | Cases | Proves | FR/NFR |
+|---|---|---|---|
+| A Authentication & token integrity | TC-410…TC-415 | Missing / tampered / expired / `alg:none` / forged-role tokens all fail; no dev secret in a deployment | NFR-03 |
+| B Role escalation | TC-416, TC-417 | Jawan reaches nothing privileged; admin holds pipelines not content; auditor is content-blind | NFR-03, [rbac-matrix.md](../compliance/rbac-matrix.md) |
+| C IDOR on every path parameter | TC-418…TC-425 (+TC-420b) | `{pseudonym_id}`, `{case_id}`, `{unit_id}`, `{request_id}`, `{batch_id}`, `{run_id}`, `{bundle_id}` each tested from a principal with no claim to that object, plus a route-inventory guard that fails when a new parameterised route has no case | NFR-03, FR-12, FR-14, FR-16 |
+| D Command firewall, both layers | TC-426…TC-430 | Middleware **and** handler enforce independently; path-normalisation bypasses fail; full route scrape leaks nothing | FR-14, NFR-03, [ADR-0003](../architecture/decisions/0003-two-tier-output-k-anonymity.md) |
+| E Dual-key unmask | TC-431…TC-436 | One principal ≠ two keys; two counsellors ≠ two keys; consent and purpose vocabulary enforced; grants expire | FR-16, NFR-02 |
+| F Break-glass | TC-437…TC-439 | Subject and welfare officer notified, oversight flagged; abuse cost and window honestly measured | NFR-08 |
+| G Audit chain | TC-440…TC-444 | Append-only at the DB; hash chain detects content edits; timestamp and tail-truncation gaps recorded | NFR-08, NFR-03 |
+| H Consent gate | TC-445…TC-449 | Every voluntary-bundle write is gated; withdrawal is invisible to command; artefact evidence quality | FR-17, NFR-01 |
+| I k-anonymity & inference | TC-450…TC-452 (+TC-450b) | Sub-k suppression across all seven aggregate routes, complement suppression, and the differencing attack that currently defeats both | FR-14, FR-19 |
+| J Retention & expiry | TC-453…TC-455 | Expiry idempotent and trend-preserving; passive-feature and client-timestamp gaps | FR-18, NFR-01 |
+| K Transport & platform | TC-456…TC-460 | CORS, login throttling, upload cap, receipt completeness, data at rest | NFR-03 |
+
+**How to run.** [security-test-cases.md](security-test-cases.md) §1 has the seed + `uvicorn` + token-helper setup; every case is a copy-pasteable `curl`, so QA (tejas) executes them by hand without reading Python. Automated coverage is specified per case and belongs in `backend/tests/` — proposed files: `test_security_auth.py`, `test_security_idor.py`, `test_security_audit.py`, `test_security_kanonymity.py`, `test_security_retention.py`, plus additions to the existing `test_firewall.py` and `test_privacy.py`. Those files are the `backend/` owner's to write (AGENTS.md rule 2); this plan specifies them, it does not author them.
+
+**Gate rule.** A red case in Section D or Section I blocks merge and demo exactly as §4 does — those two sections *are* the ADR-0003 firewall, tested adversarially. Red cases in Sections A/C/E/F/G/H/J/K block the **pilot**, not the demo, and are ranked in [security-test-cases.md](security-test-cases.md) §3.
+
+**Run log.**
+
+| Date | Run by | Result |
+|---|---|---|
+| 2026-09-09 ~02:00 | neel (PRIV-003) | 53 cases specified (TC-410…TC-460 plus TC-420b, TC-450b); executed against a seeded local API. PASS: TC-410…414, 416, 417, 421…423, 425, 426, 427, 429, 430, 431, 433…437, 440, 441, 444, 445…448, 450, 450b, 453. RED: TC-415 (dev secret, expected locally), 418, 419, 420, 424, 428, 432 (accepted), 438, 439, 442, 443, 449, 451, 452, 454, 455, 456, 457, 458, 459, 460; narrow RED inside TC-420b and TC-421. TC-451 was the only §4-gate red. |
+| 2026-09-09 ~02:20 | neel — adversarial re-verification of the row above | **The red list was acted on: 16 of the cases above are now closed in `backend/` and carry automated regression cover in `backend/tests/test_security_hardening.py`** (tests named `test_tc<id>_*` for 415, 418, 419, 420, 420b, 428, 429, 438, 442, 443, 449, 450b, 451, 452, 454, 455, 456, 457, 458). Re-verified by execution, not by reading: TC-451/452 (`morale_index`/`elevated_share` now `null` when any cell is suppressed; `suppressed_keys` removed), TC-442 (`at` and `seq` now inside the hashed body — rewriting `at` with both append-only triggers dropped yields `ok: false`), TC-443 (new `AuditCheckpoint` anchor stores `entry_count` + `head_hash`, so tail truncation is detected), TC-418/419 (counsellor reads of unrelated pseudonyms now 403 on `/risk/{id}`, `/risk/{id}/trend`, `/signals/{id}`), TC-456 (no `Access-Control-Allow-Origin` for an unlisted origin), TC-457 (429 after 10 failed logins), TC-454 (`PassiveFeature` and `VoiceFeature` now purged by `expire_raw`), TC-455 (client `recorded_at` clamped by `clock.clamp_capture_date`), TC-449 (`artefact_hash` is a real content digest). **§4 gate: GREEN.** Backend suite: `110 passed`. Still open by design or deferred: TC-415 (dev secret — expected locally), TC-424, TC-432 (accepted), TC-439, TC-459, TC-460 (encryption at rest — pre-pilot, manual). The route-inventory guard in [security-test-cases.md](security-test-cases.md) §C must still be run first on every subsequent execution. |

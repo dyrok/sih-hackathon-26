@@ -1,0 +1,13 @@
+{
+  "name": "@saarthi/tokens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "SAARTHI design tokens — single source of truth, no hardcoded OKLCH outside this package",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tokens.css": "./dist/tokens.css"
+  },
+  "scripts": {
+    "generate": "bun scripts/generate.mjs"
+  }
+}

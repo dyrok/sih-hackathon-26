@@ -7,7 +7,7 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 from sqlalchemy.orm import Session
 
-from .audit import write_audit
+from .audit import write_audit, write_deny
 from .db import SessionLocal
 from .models import User
 from .security import decode_token
@@ -23,9 +23,16 @@ COMMANDER_DENIED_PREFIXES = (
     "/app",
     "/welfare",
     "/admin",
+    "/jobs",
+    "/audit",
 )
 
 COMMANDER_ALLOWED_EXACT = {
+    # Self-scope only, no subject selector: this is the commander's OWN
+    # check-in (F07 screen 6, officer-first rollout). It cannot express a
+    # request for anyone else, so it is not an exception to ADR-0003.
+    "/me/checkins",
+    "/me/sitreps",
     "/health",
     "/auth/token",
     "/auth/me",
@@ -52,7 +59,7 @@ def path_denied_to_commander(path: str) -> bool:
 def forbid_commander(user: User, *, db: Session, resource_type: str, resource_id: str | None = None) -> None:
     if user.role != "commander":
         return
-    write_audit(
+    write_deny(
         db,
         actor=user,
         action="firewall.deny",

@@ -1,0 +1,37 @@
+{
+  "name": "@saarthi/app-jawan",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev --port 3100",
+    "build": "next build",
+    "start": "next start --port 3100",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "next": "15.3.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "@fontsource/noto-sans": "^5.1.1",
+    "@fontsource/noto-sans-devanagari": "^5.1.1",
+    "@saarthi/tokens": "workspace:*",
+    "@saarthi/i18n": "workspace:*",
+    "@saarthi/ui": "workspace:*",
+    "@saarthi/sync": "workspace:*",
+    "@saarthi/api": "workspace:*",
+    "@saarthi/instruments": "workspace:*"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "eslint": "^9.31.0",
+    "eslint-config-next": "15.3.3",
+    "@next/eslint-plugin-next": "15.3.3",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "typescript": "^5.9.2"
+  }
+}

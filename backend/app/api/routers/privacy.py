@@ -6,12 +6,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
-from ...audit import write_audit
+from ...audit import write_audit, write_deny
 from ...clock import as_of
 from ...config import get_settings
 from ...consent import active_consent, has_voluntary_consent, withdraw_all
 from ...db import get_db
 from ...firewall import forbid_commander
+from ...consent import artefact_hash
 from ...ids import nid
 from ...models import (
     BreakGlassEvent,
@@ -45,6 +46,9 @@ class UnmaskIn(BaseModel):
 class BreakGlassIn(BaseModel):
     pseudonym_id: str
     reason: str
+    #: Required only past the weekly cap: an explicit statement that the
+    #: counsellor accepts oversight review for an above-cap disclosure.
+    acknowledge_oversight: bool = False
 
 
 class ConsentIn(BaseModel):
@@ -62,7 +66,8 @@ def unit_aggregate(
 ):
     if user.role == "commander" and user.unit_id and user.unit_id != unit_id:
         raise HTTPException(403, "commander may only view own unit chain")
-    data = aggregate_unit(db, unit_id)
+    detailed = user.role in {"counsellor", "welfare_officer"}
+    data = aggregate_unit(db, unit_id, detailed=detailed)
     write_audit(
         db,
         actor=user,
@@ -84,7 +89,7 @@ def open_unmask(
     if body.purpose_string not in PURPOSE_VOCAB:
         raise HTTPException(400, "purpose not in vocabulary")
     if not active_consent(db, body.pseudonym_id):
-        write_audit(
+        write_deny(
             db,
             actor=user,
             action="unmask.deny",
@@ -136,7 +141,7 @@ def approve_unmask(
     # One person holding both roles ≠ two keys.
     other = req.counsellor_user_id if user.role == "welfare_officer" else req.welfare_user_id
     if other == user.id:
-        write_audit(
+        write_deny(
             db,
             actor=user,
             action="unmask.deny",
@@ -236,6 +241,41 @@ def break_glass(
     forbid_commander(user, db=db, resource_type="break_glass", resource_id=body.pseudonym_id)
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     settings = get_settings()
+
+    # Break-glass is meant to be the expensive path. Before this, it was the
+    # cheap one: unlimited, un-countersigned identity disclosure (TC-438).
+    # It is never hard-blocked — waiting for a second key can be the costlier
+    # failure — but past the weekly cap it demands an explicit oversight
+    # acknowledgement, a substantive reason, and it notifies every welfare
+    # officer rather than one.
+    week_start = now - timedelta(days=7)
+    recent = (
+        db.query(BreakGlassEvent)
+        .filter(
+            BreakGlassEvent.counsellor_user_id == user.id,
+            BreakGlassEvent.opened_at >= week_start,
+        )
+        .count()
+    )
+    above_cap = recent >= settings.break_glass_weekly_cap
+    if above_cap and not (body.acknowledge_oversight and len(body.reason.strip()) >= 20):
+        write_deny(
+            db,
+            actor=user,
+            action="break_glass.throttled",
+            resource_type="break_glass_event",
+            resource_id=body.pseudonym_id,
+            subject_pseudonym_id=body.pseudonym_id,
+            denied=True,
+            reason="weekly break-glass cap reached",
+            payload={"used": recent, "cap": settings.break_glass_weekly_cap},
+        )
+        raise HTTPException(
+            429,
+            "break-glass cap reached (%d this week). Use the dual-key path, or resend with "
+            "acknowledge_oversight=true and a reason of at least 20 characters — the request "
+            "will be countersigned by welfare oversight." % recent,
+        )
     event = BreakGlassEvent(
         id=nid("bg"),
         counsellor_user_id=user.id,
@@ -258,15 +298,17 @@ def break_glass(
             created_at=now,
         )
     )
-    welfare = db.query(User).filter(User.role == "welfare_officer").first()
-    if welfare:
+    welfare_officers = db.query(User).filter(User.role == "welfare_officer").all()
+    # Above the cap every welfare officer is notified, not just the first one.
+    recipients = welfare_officers if above_cap else welfare_officers[:1]
+    for welfare in recipients:
         db.add(
             Notification(
                 id=nid("nt"),
                 recipient_user_id=welfare.id,
                 kind="break_glass_oversight",
                 body_key="notify.breakglass.welfare",
-                payload={"pseudonym_id": body.pseudonym_id},
+                payload={"pseudonym_id": body.pseudonym_id, "above_cap": above_cap},
                 created_at=now,
             )
         )
@@ -280,10 +322,14 @@ def break_glass(
         subject_pseudonym_id=body.pseudonym_id,
         purpose="imminent_harm",
         reason=body.reason,
+        payload={"used_this_week": recent + 1, "above_cap": above_cap},
     )
     ident = db.query(IdentityMap).filter(IdentityMap.pseudonym_id == body.pseudonym_id).one_or_none()
     return {
         "break_glass_id": event.id,
+        "used_this_week": recent + 1,
+        "weekly_cap": settings.break_glass_weekly_cap,
+        "above_cap": above_cap,
         "expires_at": event.expires_at.isoformat(),
         "notified_subject": True,
         "notified_welfare": True,
@@ -313,7 +359,15 @@ def grant_consent(
         language=body.language,
         consent_version="v1",
         granted_at=now,
-        artefact_hash=nid("h"),
+        artefact_hash=artefact_hash(
+            principal=user.pseudonym_id,
+            bundle_id=body.bundle_id,
+            purpose=body.purpose_string,
+            categories=body.data_categories,
+            language=body.language,
+            version="v1",
+            granted_at=now,
+        ),
     )
     db.add(artefact)
     db.flush()

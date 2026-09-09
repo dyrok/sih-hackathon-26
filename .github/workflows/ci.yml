@@ -1,0 +1,109 @@
+name: CI
+
+# The ADR-0003 firewall suite is a must-pass gate: a red case there blocks merge
+# and blocks the demo (docs/quality/test-plan.md §4). It runs first, on its own,
+# so a failure is unmissable rather than buried in a long log.
+
+on:
+  push:
+    branches: [main, kv, neel, ayush, manan, risa, tejas]
+  pull_request:
+    branches: [main]
+
+jobs:
+  firewall:
+    name: ADR-0003 firewall gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+      - name: Firewall, RBAC and security regressions
+        working-directory: backend
+        run: |
+          python -m pytest -q \
+            tests/test_firewall.py \
+            tests/test_privacy.py \
+            tests/test_rbac_enforcement.py \
+            tests/test_security_hardening.py
+
+  backend:
+    name: Backend suite + coverage
+    runs-on: ubuntu-latest
+    needs: firewall
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+      - name: pytest with coverage
+        working-directory: backend
+        run: python -m pytest -q --cov=app --cov-report=term-missing --cov-fail-under=80
+      - name: ML-002 validation harness (persona arc must reproduce exactly)
+        working-directory: backend
+        run: python -m app.ml.harness > /dev/null
+
+  data:
+    name: Synthetic data generator
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install backend (the generator writes through its models)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+      - name: Determinism, persona arc, k >= 5, distributions
+        run: python -m pytest data/tests -q
+      - name: TC-701 / TC-702 performance envelope (NFR-06)
+        # A >20% regression against the recorded number is the real signal; the
+        # hard gate here is the PRD's 60 s / 2 s ceiling.
+        run: python3 scripts/perf.py --gate
+
+  web:
+    name: Web — boundaries, types, tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: "1.4.0"
+      - name: Install workspace
+        working-directory: web
+        run: bun install --frozen-lockfile
+      - name: Architectural boundaries
+        # Role isolation, tokens-only colour, i18n keys only, en/hi parity,
+        # no individual-row shape in the commander build.
+        working-directory: web
+        run: bun scripts/lint-boundaries.mjs
+      - name: Typecheck
+        working-directory: web
+        run: bun run typecheck
+      - name: Unit tests (offline queue, instruments, wire format)
+        working-directory: web
+        run: bun test
+      - name: Production build
+        working-directory: web
+        run: bun run build
+
+  docs:
+    name: Board and checklists in sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Checklists match board.md
+        run: python3 executable/tools/sync-checklists.py --check
