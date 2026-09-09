@@ -29,5 +29,16 @@ backend/saarthi.db
 backend/ml_runs/
 docs/product/submission/node_modules/
 
+# generated fixtures (deterministic — regenerate with `make generate-csv`)
+.data-csv/
+
+# design-canvas build output (~2 MB editor payload). The artboards beside it
+# are the source; re-seed with docs/architecture/design/mockups/README.md.
+docs/architecture/design/mockups/*.html
+!docs/architecture/design/mockups/*.dc.html
+
+# next.js build output (the web workspace has its own .gitignore too)
+.next/
+
 # OS
 .DS_Store
