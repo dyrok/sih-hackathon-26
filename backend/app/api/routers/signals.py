@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from ...audit import write_audit
+from ...authz import assert_subject_scope
 from ...clock import as_of
 from ...db import get_db
 from ...firewall import forbid_commander
@@ -45,6 +46,7 @@ def get_signals(
     forbid_commander(user, db=db, resource_type="signals", resource_id=pseudonym_id)
     if user.role == "admin":
         raise HTTPException(403, "admin has no read grant on individual signals")
+    assert_subject_scope(db, user, pseudonym_id, resource_type="signal_snapshot")
     rows = (
         db.query(SignalSnapshot)
         .filter(SignalSnapshot.pseudonym_id == pseudonym_id, SignalSnapshot.window_end == as_of())

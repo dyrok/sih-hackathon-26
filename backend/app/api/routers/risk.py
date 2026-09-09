@@ -5,6 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ...audit import write_audit
+from ...authz import assert_subject_scope
 from ...clock import as_of
 from ...db import get_db
 from ...firewall import forbid_commander
@@ -53,6 +54,9 @@ def get_risk(
     user: User = Depends(require_roles("counsellor", "welfare_officer")),
 ):
     forbid_commander(user, db=db, resource_type="risk", resource_id=pseudonym_id)
+    # Role alone is not enough: the subject must be on this principal's caseload
+    # (F06 — a case exists only because the engine raised one).
+    assert_subject_scope(db, user, pseudonym_id, resource_type="risk_score")
     row = _latest(db, pseudonym_id)
     factors = db.query(RiskFactor).filter(RiskFactor.score_id == row.id).all()
     mask = db.query(MaskingFlag).filter(MaskingFlag.score_id == row.id).one_or_none()
@@ -90,6 +94,9 @@ def explanation(
     user: User = Depends(require_roles("counsellor", "welfare_officer")),
 ):
     forbid_commander(user, db=db, resource_type="risk", resource_id=pseudonym_id)
+    # Role alone is not enough: the subject must be on this principal's caseload
+    # (F06 — a case exists only because the engine raised one).
+    assert_subject_scope(db, user, pseudonym_id, resource_type="risk_score")
     row = _latest(db, pseudonym_id)
     factors = db.query(RiskFactor).filter(RiskFactor.score_id == row.id).all()
     mask = db.query(MaskingFlag).filter(MaskingFlag.score_id == row.id).one_or_none()

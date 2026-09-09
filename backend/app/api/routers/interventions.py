@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ...audit import write_audit
+from ...authz import assert_case_scope
 from ...clock import as_of
 from ...db import get_db
 from ...firewall import forbid_commander
@@ -58,8 +59,11 @@ def queue(
     for case, tri in rows:
         if user.role == "counsellor" and tri.assigned_counsellor_id not in {None, user.id}:
             continue
-        if user.role == "welfare_officer" and user.assigned_units and case.unit_id not in (user.assigned_units or []):
-            continue
+        if user.role == "welfare_officer":
+            # An empty assignment list means NO units, never all of them.
+            units = user.assigned_units or []
+            if not units or case.unit_id not in units:
+                continue
         out.append(
             {
                 "case_id": case.id,
@@ -89,6 +93,9 @@ def add_action(
     case = db.get(ResponseCase, case_id)
     if case is None:
         raise HTTPException(404, "case not found")
+    # The queue is filtered by caseload; without this the item routes were not,
+    # which let one counsellor close another's case (TC-420).
+    assert_case_scope(db, user, case)
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     action = InterventionAction(
         id=nid("act"),
@@ -128,6 +135,9 @@ def record_outcome(
     case = db.get(ResponseCase, case_id)
     if case is None:
         raise HTTPException(404, "case not found")
+    # The queue is filtered by caseload; without this the item routes were not,
+    # which let one counsellor close another's case (TC-420).
+    assert_case_scope(db, user, case)
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     row = InterventionOutcome(
         id=nid("oc"),
@@ -175,6 +185,9 @@ def telemanas(
     case = db.get(ResponseCase, case_id)
     if case is None:
         raise HTTPException(404, "case not found")
+    # The queue is filtered by caseload; without this the item routes were not,
+    # which let one counsellor close another's case (TC-420).
+    assert_case_scope(db, user, case)
     now = datetime.now(timezone.utc).replace(tzinfo=None)
     row = TelemanasReferral(
         id=nid("tm"),
