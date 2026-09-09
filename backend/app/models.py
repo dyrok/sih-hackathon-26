@@ -538,6 +538,32 @@ class BuddyState(Base):
     updated_at = Column(DateTime, nullable=False)
 
 
+class DutySitrep(Base):
+    """Officer's own daily duty log (voice sitrep). Self-scope only.
+
+    The transcript is a *work* artefact the officer chose to file. Tone and
+    mood fields are a private heuristic for that same officer — they are never
+    joined into unit aggregates and there is no subject selector on the route.
+    """
+
+    __tablename__ = "duty_sitreps"
+
+    id = Column(String, primary_key=True)
+    user_id = Column(String, nullable=False, index=True)
+    duty_date = Column(Date, nullable=False, index=True)
+    transcript = Column(Text, nullable=False)
+    work_summary = Column(Text, nullable=False)
+    work_bullets = Column(JSON, nullable=False)
+    answers = Column(JSON, nullable=True)
+    tone_label = Column(String, nullable=False)
+    mood_label = Column(String, nullable=False)
+    mood_score = Column(Integer, nullable=False)
+    wellness_summary = Column(Text, nullable=False)
+    flags = Column(JSON, nullable=False)
+    duration_s = Column(Float, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+
+
 class VoiceFeature(Base):
     """F03 / ADR-0002 — prosody feature vector only. There is deliberately no
     audio, transcript, speaker-embedding or device-fingerprint column here:

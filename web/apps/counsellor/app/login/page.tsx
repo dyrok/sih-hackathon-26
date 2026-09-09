@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useT } from "@saarthi/i18n";
-import { Button, Field, LanguageToggle, TextInput } from "@saarthi/ui";
+import { Button, DemoQuickLogin, Field, LanguageToggle, TextInput } from "@saarthi/ui";
 import { clearSession, login, saveSession } from "@saarthi/api";
 
 /** Only these two roles have a console here. Everything else is sent away with
@@ -20,13 +20,12 @@ export default function LoginPage() {
   const [errorKey, setErrorKey] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
+  const signIn = async (user: string, pass: string) => {
     if (busy) return;
     setBusy(true);
     setErrorKey(null);
     try {
-      const session = await login(username.trim(), password);
+      const session = await login(user.trim(), pass);
       if (!CONSOLE_ROLES.has(String(session.role))) {
         clearSession();
         setErrorKey("login.wrongRole");
@@ -41,12 +40,26 @@ export default function LoginPage() {
     }
   };
 
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    void signIn(username, password);
+  };
+
   const canSubmit = username.trim().length > 0 && password.length > 0;
 
   return (
     <main className="cons-login" id="content">
       <h1 className="cons-login__title">{t("cons.title")}</h1>
       <p className="cons-login__sub">{t("cons.login.roleNote")}</p>
+      <DemoQuickLogin
+        selectedUsername={username}
+        disabled={busy}
+        onPick={(user, pass) => {
+          setUsername(user);
+          setPassword(pass);
+          void signIn(user, pass);
+        }}
+      />
       <form className="cons-login__form" onSubmit={submit}>
         <Field labelKey="login.username" htmlFor="cons-username" required>
           <TextInput
@@ -76,7 +89,6 @@ export default function LoginPage() {
           {busy ? t("login.signingIn") : t("login.submit")}
         </Button>
       </form>
-      <p className="cons-login__foot">{t("cons.login.demoHint")}</p>
       <LanguageToggle />
     </main>
   );

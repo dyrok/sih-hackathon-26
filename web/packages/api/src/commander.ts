@@ -218,3 +218,42 @@ export function submitOwnCheckIn(body: {
     self_scope: boolean;
   }>;
 }
+
+/** Officer's own duty log. Self-scope — no one else's rows, no unit score. */
+export type Sitrep = {
+  id: string;
+  duty_date: string;
+  transcript: string;
+  work_summary: string;
+  work_bullets: string[];
+  tone_label: "calm" | "strained" | "flat" | string;
+  mood_label: string;
+  mood_score: number;
+  wellness_summary: string;
+  flags: string[];
+  answers?: { id: string; answer: string }[] | null;
+  duration_s?: number | null;
+  heuristic: boolean;
+  self_scope: boolean;
+  questions?: string[];
+};
+
+export type SitrepList = {
+  self_scope: boolean;
+  as_of: string;
+  sitreps: Sitrep[];
+};
+
+export function getOwnSitreps(days = 14): Promise<SitrepList> {
+  return apiFetch(`/me/sitreps?days=${days}`) as Promise<SitrepList>;
+}
+
+export function submitOwnSitrep(body: {
+  transcript: string;
+  duration_s?: number;
+  rms_mean?: number;
+  rms_var?: number;
+  answers?: { id: string; answer: string }[];
+}): Promise<Sitrep> {
+  return apiFetch("/me/sitreps", { method: "POST", body: JSON.stringify(body) }) as Promise<Sitrep>;
+}

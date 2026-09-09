@@ -32,6 +32,7 @@ COMMANDER_ALLOWED_EXACT = {
     # check-in (F07 screen 6, officer-first rollout). It cannot express a
     # request for anyone else, so it is not an exception to ADR-0003.
     "/me/checkins",
+    "/me/sitreps",
     "/health",
     "/auth/token",
     "/auth/me",

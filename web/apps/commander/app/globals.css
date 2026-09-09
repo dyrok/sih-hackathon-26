@@ -768,6 +768,101 @@ body {
   color: var(--sa-color-ink-secondary);
 }
 
+/* --- Officer duty sitrep -------------------------------------------------- */
+.cmd-sitrep {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+  max-width: 72ch;
+}
+.cmd-sitrep__capture,
+.cmd-sitrep__q,
+.cmd-sitrep__reports {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+}
+.cmd-sitrep__live {
+  min-height: 4.5rem;
+  margin: 0;
+  padding: var(--sa-space-2);
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  font-size: var(--sa-type-sm);
+}
+.cmd-sitrep__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+}
+.cmd-sitrep__actions .sa-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.cmd-sitrep__hint,
+.cmd-sitrep__private {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+}
+.cmd-sitrep__q-kicker {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+  font-weight: 700;
+  color: var(--sa-color-ink-secondary);
+}
+.cmd-sitrep__q-ask {
+  margin: 0;
+  font-size: var(--sa-type-md);
+  font-weight: 600;
+}
+.cmd-sitrep__answer {
+  width: 100%;
+  min-height: 96px;
+  padding: var(--sa-space-2);
+  resize: vertical;
+}
+.cmd-sitrep__card {
+  padding: var(--sa-space-2);
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+}
+.cmd-sitrep__card h2 {
+  margin: 0 0 var(--sa-space-1);
+  font-size: var(--sa-type-sm);
+  color: var(--sa-color-brand-olive);
+}
+.cmd-sitrep__card--private {
+  border-color: var(--sa-color-brand-olive);
+}
+.cmd-sitrep__card ul {
+  margin: 0;
+  padding-left: 1.2em;
+}
+.cmd-sitrep__history h2 {
+  font-size: var(--sa-type-sm);
+  margin: var(--sa-space-2) 0 var(--sa-space-1);
+}
+.cmd-sitrep__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+.cmd-sitrep__list li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--sa-space-1) 0;
+  border-bottom: 1px solid var(--sa-color-brand-olive-soft);
+  font-size: var(--sa-type-sm);
+}
+
 /* --- Login ----------------------------------------------------------------- */
 
 .cmd-login {

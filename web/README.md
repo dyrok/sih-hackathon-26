@@ -72,7 +72,7 @@ bun run dev:commander       # http://localhost:3300    (or: make commander)
 
 ## Demo logins
 
-All demo accounts use the password **`saarthi`** (`backend/app/seed.py`). Seed with `make seed` from the repo root.
+All demo accounts use the password **`saarthi`** (`backend/app/seed.py`). Seed with `make seed` from the repo root. Each login screen has a six-account strip that fills the fields and signs in on tap.
 
 | Username | Role | Use it on |
 |---|---|---|

@@ -4,7 +4,7 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { useT } from "@saarthi/i18n";
-import { Button, LanguageToggle } from "@saarthi/ui";
+import { Button, DemoQuickLogin, LanguageToggle } from "@saarthi/ui";
 import { clearSession, login, saveSession } from "@saarthi/api";
 
 /**
@@ -20,13 +20,12 @@ export default function LoginPage() {
   const [error, setError] = useState<"credentials" | "role" | null>(null);
   const [busy, setBusy] = useState(false);
 
-  const submit = async (e: FormEvent) => {
-    e.preventDefault();
+  const signIn = async (user: string, pass: string) => {
     if (busy) return;
     setBusy(true);
     setError(null);
     try {
-      const session = await login(username, password);
+      const session = await login(user.trim(), pass);
       if (session.role !== "commander") {
         clearSession();
         setError("role");
@@ -41,6 +40,11 @@ export default function LoginPage() {
     }
   };
 
+  const submit = (e: FormEvent) => {
+    e.preventDefault();
+    void signIn(username, password);
+  };
+
   return (
     <div className="cmd-login">
       <div className="cmd-login__lang">
@@ -48,6 +52,15 @@ export default function LoginPage() {
       </div>
       <h1 className="cmd-login__title">{t("login.title")}</h1>
       <p className="cmd-login__sub">{t("cmd.title")}</p>
+      <DemoQuickLogin
+        selectedUsername={username}
+        disabled={busy}
+        onPick={(user, pass) => {
+          setUsername(user);
+          setPassword(pass);
+          void signIn(user, pass);
+        }}
+      />
       <form className="cmd-login__form" onSubmit={submit}>
         <div>
           <label className="cmd-login__label" htmlFor="username">

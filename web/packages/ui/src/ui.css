@@ -1172,3 +1172,79 @@
   gap: var(--sa-space-1);
   min-width: 0;
 }
+
+/* --- Demo quick-login (jury walkthrough) ---------------------------------- */
+.sa-quicklogin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+  margin: 0 0 var(--sa-space-2);
+}
+.sa-quicklogin__heading {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+  font-weight: 700;
+  color: var(--sa-color-ink-secondary);
+}
+.sa-quicklogin__hint {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+}
+.sa-quicklogin__tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sa-space-1);
+}
+@media (min-width: 520px) {
+  .sa-quicklogin__tabs {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+}
+.sa-quicklogin__tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  min-height: 48px;
+  padding: 6px var(--sa-space-2);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 8px;
+  background: var(--sa-color-surface-raised);
+  color: var(--sa-color-ink-primary);
+  font-family: var(--sa-font-sans);
+  text-align: start;
+  cursor: pointer;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .sa-quicklogin__tab {
+    transition: background-color 120ms ease-out, border-color 120ms ease-out;
+  }
+}
+.sa-quicklogin__tab:hover {
+  border-color: var(--sa-color-brand-olive);
+}
+.sa-quicklogin__tab:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+.sa-quicklogin__tab:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.sa-quicklogin__tab--selected {
+  background: var(--sa-color-brand-olive-soft);
+  border-color: var(--sa-color-brand-olive);
+}
+.sa-quicklogin__name {
+  font-size: var(--sa-type-xs);
+  font-weight: 700;
+  line-height: var(--sa-line-height);
+}
+.sa-quicklogin__user {
+  font-size: var(--sa-type-xs);
+  font-weight: 500;
+  color: var(--sa-color-ink-secondary);
+  overflow-wrap: anywhere;
+}

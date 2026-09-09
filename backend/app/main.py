@@ -19,6 +19,7 @@ from .api.routers import (
     risk,
     self_service,
     signals,
+    sitrep,
 )
 from .config import get_settings
 from .db import init_db
@@ -68,6 +69,7 @@ app.include_router(pulse.router)
 app.include_router(buddy.router)
 app.include_router(counsellor.router)
 app.include_router(commander.router)
+app.include_router(sitrep.router)
 
 
 @app.get("/health")

@@ -13,6 +13,7 @@ import {
   IconSliders,
   IconTrendUp,
   IconCalendar,
+  IconMic,
   LanguageToggle,
 } from "@saarthi/ui";
 import type { ConsoleNavItem } from "@saarthi/ui";
@@ -26,6 +27,7 @@ const NAV: ConsoleNavItem[] = [
   { href: "/simulator", labelKey: "cmd.nav.simulator", icon: IconSliders },
   { href: "/forecast", labelKey: "cmd.nav.forecast", icon: IconCalendar },
   { href: "/checkin", labelKey: "cmd.nav.checkin", icon: IconHeart },
+  { href: "/sitrep", labelKey: "cmd.nav.sitrep", icon: IconMic },
 ];
 
 /** The screens that read one unit at a time and therefore share the picker. */

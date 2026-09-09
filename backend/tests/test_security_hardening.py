@@ -139,6 +139,7 @@ def test_tc428_middleware_covers_the_admin_and_audit_prefixes():
         assert path_denied_to_commander(path) is True, path
     # …without swallowing the commander's own self-scope check-in (F07 screen 6)
     assert path_denied_to_commander("/me/checkins") is False
+    assert path_denied_to_commander("/me/sitreps") is False
     assert path_denied_to_commander("/aggregates/units") is False
 
 

@@ -12,6 +12,7 @@ from .ids import nid
 from .models import (
     CheckIn,
     ConsentArtefact,
+    DutySitrep,
     HrDeployment,
     HrDutyRoster,
     HrIncident,
@@ -21,6 +22,7 @@ from .models import (
     PassiveFeature,
     User,
 )
+from .sitrep_analyze import analyze
 from .passwords import hash_password
 from .risk.scorer import score_person
 from .signals.snapshot import recompute_all
@@ -372,6 +374,80 @@ def seed_demo(db: Session, score: bool = True) -> None:
         for ident in db.query(IdentityMap).all():
             score_person(db, ident.pseudonym_id, as_of=as_of())
     db.flush()
+    seed_officer_sitreps(db)
+    db.flush()
+
+
+#: Canned duty logs for the commander walkthrough. No welfare identity of
+#: another person appears here — these are the CO's own words.
+_SITREP_DAYS = (
+    (
+        6,
+        "Morning inspection of the lines at 0530. Parade and PT until 0700, all present. Two sections on the eastern fence 0900 to 1400, no incident. Afternoon with the JCOs on the leave backlog. Evening briefing at 1800. Long day. Will walk the perimeter once more at 2100.",
+        0.031,
+        0.006,
+    ),
+    (
+        5,
+        "Night picquet rota posted after a short briefing. The fence is quiet. Sports in the afternoon went well. Leave desk is still slow.",
+        0.028,
+        0.002,
+    ),
+    (
+        4,
+        "Training day. Range in the morning, classroom in the afternoon. Parade went well. Voice is fine. Early night.",
+        0.033,
+        0.0015,
+    ),
+    (
+        3,
+        "Sat with the JCOs on leave backlog — six applications still pending from last week. Admin heavier than the ground. Tired by 1900.",
+        0.022,
+        0.005,
+    ),
+    (
+        2,
+        "Eastern fence inspection 0900 to 1400. No incident. Water point delayed the last loop. Long hours on my feet.",
+        0.029,
+        0.0045,
+    ),
+    (
+        1,
+        "Steady morning. Parade, PT, office. Nothing to flag for tomorrow's briefing. Fine.",
+        0.03,
+        0.001,
+    ),
+)
+
+
+def seed_officer_sitreps(db: Session) -> None:
+    """Dummy sitreps so the duty-log screen is not empty on first open."""
+    if db.query(DutySitrep).first() is not None:
+        return
+    officer = db.query(User).filter(User.username == "commander.3bn").one_or_none()
+    if officer is None:
+        return
+    today = as_of()
+    for days_ago, text, rms_mean, rms_var in _SITREP_DAYS:
+        result = analyze(text, rms_mean=rms_mean, rms_var=rms_var)
+        db.add(
+            DutySitrep(
+                id=nid("sr"),
+                user_id=officer.id,
+                duty_date=today - timedelta(days=days_ago),
+                transcript=text,
+                work_summary=result["work_summary"],
+                work_bullets=result["work_bullets"],
+                answers=None,
+                tone_label=result["tone_label"],
+                mood_label=result["mood_label"],
+                mood_score=result["mood_score"],
+                wellness_summary=result["wellness_summary"],
+                flags=result["flags"],
+                duration_s=42.0,
+                created_at=datetime.now(timezone.utc),
+            )
+        )
 
 
 def main() -> None:

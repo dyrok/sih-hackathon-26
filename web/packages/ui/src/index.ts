@@ -38,6 +38,8 @@ export type { UndoBarProps } from "./UndoBar";
 export { ConfirmDialog } from "./ConfirmDialog";
 export type { ConfirmDialogProps } from "./ConfirmDialog";
 export { LanguageToggle } from "./LanguageToggle";
+export { DemoQuickLogin, DEMO_ACCOUNTS, DEMO_PASSWORD } from "./DemoQuickLogin";
+export type { DemoAccount, DemoQuickLoginProps } from "./DemoQuickLogin";
 export { SkipLink } from "./SkipLink";
 export type { SkipLinkProps } from "./SkipLink";
 
