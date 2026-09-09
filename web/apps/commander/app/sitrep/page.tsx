@@ -286,7 +286,9 @@ export default function SitrepPage() {
               {t("sitrep.well.mood")}: {t(`sitrep.mood.${report.mood_label}`)}
             </p>
             <p>{report.wellness_summary}</p>
-            <p className="cmd-sitrep__hint">{t("sitrep.well.heuristic")}</p>
+            <p className="cmd-sitrep__hint">
+              {t(report.heuristic ? "sitrep.well.heuristic" : "sitrep.well.laguna")}
+            </p>
           </article>
           <Button variant="secondary" onClick={() => { setPhase("idle"); setLive(""); setReport(null); }}>
             {t("sitrep.another")}

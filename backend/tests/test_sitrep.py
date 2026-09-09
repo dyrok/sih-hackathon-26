@@ -2,7 +2,15 @@
 
 from __future__ import annotations
 
+import pytest
+
 from tests.conftest import auth_header
+
+
+@pytest.fixture(autouse=True)
+def no_openrouter(monkeypatch):
+    """HTTP tests stay deterministic — Laguna is covered by a parse-only unit test."""
+    monkeypatch.setattr("app.sitrep_analyze.analyze_with_llm", lambda *a, **k: None)
 
 
 SAMPLE = (
@@ -71,3 +79,16 @@ def test_questions_surface_for_a_long_day(client):
     qs = pick_questions(SAMPLE)
     assert "hours" in qs or "sleep" in qs
     assert len(qs) <= 2
+
+
+def test_laguna_json_is_coerced_to_the_closed_set():
+    from app.sitrep_analyze import _coerce, _extract_json, analyze
+
+    wrapped = "Here you go\n```json\n{\"tone_label\":\"strained\",\"mood_label\":\"heavy\",\"mood_score\":3,\"work_summary\":\"Fence loop then leave desk.\",\"work_bullets\":[\"Eastern fence 0900-1400\"],\"wellness_summary\":\"Private note only.\",\"flags\":[\"fatigue_language\"],\"questions\":[\"hours\",\"sleep\"]}\n```"
+    parsed = _extract_json(wrapped)
+    assert parsed and parsed["tone_label"] == "strained"
+    base = analyze(SAMPLE, use_llm=False)
+    out = _coerce({**parsed, "tone_label": "angry", "questions": ["hours", "hack"]}, base)
+    assert out["tone_label"] == base["tone_label"]
+    assert out["questions"] == ["hours"]
+    assert out["heuristic"] is False

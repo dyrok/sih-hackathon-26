@@ -52,6 +52,7 @@ def create_sitrep(
         rms_mean=body.rms_mean,
         rms_var=body.rms_var,
         answers=body.answers,
+        use_llm=True,
     )
     row = DutySitrep(
         id=nid("sr"),
@@ -115,7 +116,7 @@ def _out(row: DutySitrep, questions: list[str] | None = None) -> dict:
         "flags": row.flags or [],
         "answers": row.answers,
         "duration_s": row.duration_s,
-        "heuristic": True,
+        "heuristic": "llm" not in (row.flags or []),
         "self_scope": True,
     }
     if questions is not None:

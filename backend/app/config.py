@@ -12,7 +12,12 @@ RULESET_PATH = BACKEND_ROOT / "config" / "rulesets" / "v1.yaml"
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_prefix="SAARTHI_", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_prefix="SAARTHI_",
+        extra="ignore",
+        env_file=str(BACKEND_ROOT / ".env"),
+        env_file_encoding="utf-8",
+    )
 
     database_url: str = "sqlite:///./saarthi.db"
     #: "demo" (laptop / air-gapped jury demo) or "production". The value gates
@@ -40,6 +45,10 @@ class Settings(BaseSettings):
     raw_ttl_days: int = 90
     triage_w_urgency: float = 0.6
     triage_w_intervenability: float = 0.4
+    #: OpenRouter key for the officer sitrep LLM. Empty = heuristic only.
+    #: Never commit this; it lives in backend/.env (gitignored).
+    openrouter_api_key: str = ""
+    openrouter_model: str = "poolside/laguna-s-2.1:free"
 
     DEV_SECRET: ClassVar[str] = "saarthi-dev-secret-change-me-32b+"
 
