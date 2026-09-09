@@ -1,0 +1,693 @@
+/* Counsellor console — app-level layout only.
+   Every colour, size and gap is a token from @saarthi/tokens. Nothing here
+   invents a value; component styling lives in @saarthi/ui (ui.css). */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--sa-color-surface-base);
+  color: var(--sa-color-ink-primary);
+  font-family: var(--sa-font-sans);
+  font-size: var(--sa-type-sm);
+  line-height: var(--sa-line-height);
+}
+
+/* Devanagari needs room (design.md §3). No fixed-height text container anywhere. */
+[data-locale="hi"] body {
+  line-height: var(--sa-line-height-hi);
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+ol,
+figure {
+  margin: 0;
+}
+
+/* --- Login ---------------------------------------------------------------- */
+.cons-login {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sa-space-2);
+  padding: var(--sa-space-3) var(--sa-space-2);
+  width: min(100%, 480px);
+  margin: 0 auto;
+}
+
+.cons-login__title {
+  font-size: var(--sa-type-lg);
+  font-weight: 700;
+  color: var(--sa-color-brand-olive);
+  letter-spacing: 0.02em;
+}
+
+.cons-login__sub {
+  font-size: var(--sa-type-sm);
+  color: var(--sa-color-ink-secondary);
+}
+
+.cons-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+}
+
+.cons-login__foot {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+}
+
+/* --- Shell chrome --------------------------------------------------------- */
+.cons-topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--sa-space-2);
+  margin-bottom: var(--sa-space-2);
+}
+
+.cons-banner {
+  margin-bottom: var(--sa-space-2);
+}
+
+/* --- Master–detail workbench --------------------------------------------- */
+.cons-workbench {
+  display: grid;
+  grid-template-columns: minmax(320px, 380px) minmax(0, 1fr);
+  gap: var(--sa-space-3);
+  align-items: start;
+}
+
+@media (max-width: 1099px) {
+  .cons-workbench {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--sa-space-2);
+  }
+}
+
+.cons-rail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+  min-width: 0;
+}
+
+.cons-rail__head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+.cons-rail__title {
+  font-size: var(--sa-type-md);
+  font-weight: 700;
+}
+
+.cons-rail__guide,
+.cons-rail__meta {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+}
+
+.cons-rail__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+.cons-row {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  text-align: start;
+  padding: var(--sa-space-2);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  background: var(--sa-color-surface-raised);
+  color: var(--sa-color-ink-primary);
+  font-family: inherit;
+  font-size: var(--sa-type-xs);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.cons-row:hover {
+  border-color: var(--sa-color-brand-olive);
+}
+
+.cons-row:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cons-row[aria-current="true"] {
+  border-color: var(--sa-color-brand-olive);
+  background: var(--sa-color-brand-olive-soft);
+}
+
+.cons-row__head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+  margin-bottom: var(--sa-space-1);
+}
+
+.cons-row__id {
+  font-size: var(--sa-type-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cons-row__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+  color: var(--sa-color-ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.cons-row__factors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+  margin-top: var(--sa-space-1);
+}
+
+.cons-row__factor {
+  display: inline-block;
+  padding: var(--sa-space-1) calc(var(--sa-space-1) * 2);
+  border-radius: 999px;
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  background: var(--sa-color-surface-base);
+  color: var(--sa-color-ink-secondary);
+  overflow-wrap: anywhere;
+}
+
+/* Placeholder rule while a row's evidence loads — the row keeps its height so
+   the queue does not jump as reasons arrive. */
+.cons-row__factor--ghost {
+  width: 60%;
+  height: 20px;
+  border-style: dashed;
+  background: var(--sa-color-brand-olive-soft);
+}
+
+.cons-row__deferred {
+  margin-top: var(--sa-space-1);
+  color: var(--sa-color-ink-secondary);
+}
+
+/* The SLA clock is factual, never alarm styling. It only gains weight. */
+.cons-sla {
+  font-variant-numeric: tabular-nums;
+  color: var(--sa-color-ink-secondary);
+}
+
+.cons-sla--over {
+  color: var(--sa-color-ink-primary);
+  font-weight: 600;
+}
+
+/* --- Detail pane ---------------------------------------------------------- */
+.cons-detail {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-3);
+  min-width: 0;
+}
+
+.cons-head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+.cons-back {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  min-height: 48px;
+  color: var(--sa-color-brand-olive);
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.cons-back:hover {
+  text-decoration: underline;
+}
+
+.cons-back:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cons-head__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sa-space-2);
+}
+
+.cons-title {
+  font-size: var(--sa-type-md);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.cons-guide {
+  font-size: var(--sa-type-sm);
+  color: var(--sa-color-ink-secondary);
+  max-width: 72ch;
+}
+
+.cons-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-2);
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.cons-subnav {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+  border-bottom: 1px solid var(--sa-color-brand-olive-soft);
+}
+
+.cons-subnav__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 calc(var(--sa-space-1) * 3);
+  color: var(--sa-color-ink-secondary);
+  text-decoration: none;
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  border-bottom: 2px solid transparent;
+}
+
+.cons-subnav__link:hover {
+  color: var(--sa-color-ink-primary);
+}
+
+.cons-subnav__link:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cons-subnav__link[aria-current="page"] {
+  color: var(--sa-color-brand-olive);
+  border-bottom-color: var(--sa-color-brand-olive);
+}
+
+.cons-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+  padding: var(--sa-space-2);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  background: var(--sa-color-surface-raised);
+  min-width: 0;
+}
+
+.cons-card__title {
+  font-size: var(--sa-type-sm);
+  font-weight: 700;
+}
+
+.cons-card__note {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  max-width: 72ch;
+}
+
+.cons-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+  min-width: 0;
+}
+
+.cons-stack--tight {
+  gap: var(--sa-space-1);
+}
+
+.cons-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-2);
+  align-items: center;
+}
+
+.cons-inline--tight {
+  gap: var(--sa-space-1);
+}
+
+/* A callout states a fact; it never stamps a person. The left rule carries the
+   weight so no surface has to turn red. */
+.cons-callout {
+  padding: var(--sa-space-2);
+  border-radius: 12px;
+  border-inline-start: 4px solid var(--sa-color-brand-olive);
+  background: var(--sa-color-brand-olive-soft);
+  font-size: var(--sa-type-xs);
+  max-width: 72ch;
+}
+
+.cons-callout--grave {
+  border-inline-start-color: var(--sa-color-state-critical);
+  background: var(--sa-color-surface-base);
+  border: 1px solid var(--sa-color-state-critical);
+  border-inline-start-width: 4px;
+}
+
+.cons-callout__title {
+  font-size: var(--sa-type-sm);
+  font-weight: 700;
+  margin-bottom: var(--sa-space-1);
+}
+
+.cons-callout__body {
+  color: var(--sa-color-ink-secondary);
+}
+
+.cons-callout--grave .cons-callout__body {
+  color: var(--sa-color-ink-primary);
+}
+
+/* Break-glass disclosure: present on every case, never shouting from it. */
+.cons-breakglass {
+  border-top: 1px solid var(--sa-color-brand-olive-soft);
+  padding-top: var(--sa-space-2);
+}
+
+.cons-breakglass__summary {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  cursor: pointer;
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-state-critical);
+}
+
+.cons-breakglass__summary:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cons-factors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-2);
+}
+
+.cons-dl {
+  display: grid;
+  grid-template-columns: auto;
+  gap: var(--sa-space-1);
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Risk-trend chart (hand-drawn SVG; TC-304 before/after on one axis) ---- */
+.cons-trend {
+  margin: 0;
+  min-width: 0;
+}
+
+.cons-trend__scroll {
+  overflow-x: auto;
+}
+
+.cons-trend__svg {
+  display: block;
+  width: 100%;
+  min-width: 320px;
+  height: auto;
+}
+
+.cons-trend__axis {
+  stroke: var(--sa-color-brand-olive-soft);
+  stroke-width: 1;
+}
+
+.cons-trend__tick {
+  fill: var(--sa-color-ink-secondary);
+  font-size: var(--sa-type-xs);
+  font-family: var(--sa-font-sans);
+}
+
+.cons-trend__line {
+  fill: none;
+  stroke: var(--sa-color-brand-olive);
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.cons-trend__marker {
+  stroke: var(--sa-color-ink-secondary);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.cons-trend__dot {
+  stroke: var(--sa-color-surface-raised);
+  stroke-width: 1.5;
+}
+
+.cons-trend__dot--green {
+  fill: var(--sa-color-state-green);
+}
+
+.cons-trend__dot--amber {
+  fill: var(--sa-color-state-amber);
+}
+
+.cons-trend__dot--red {
+  fill: var(--sa-color-state-red);
+}
+
+.cons-trend__dot--critical {
+  fill: var(--sa-color-state-critical);
+}
+
+.cons-trend__caption {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  margin-top: var(--sa-space-1);
+  max-width: 72ch;
+}
+
+.cons-trend__markers {
+  list-style: none;
+  margin: var(--sa-space-1) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+/* --- Notes ---------------------------------------------------------------- */
+/* Input and its add button stay on one line until the column is genuinely too
+   narrow, then wrap rather than shrink below a readable width. */
+.cons-themeadd {
+  flex-wrap: wrap;
+}
+
+.cons-themeadd .sa-input {
+  flex: 1 1 16ch;
+  width: auto;
+  min-width: 16ch;
+}
+
+.cons-themes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+}
+
+.cons-theme {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sa-space-1);
+  padding: var(--sa-space-1) calc(var(--sa-space-1) * 2);
+  border-radius: 999px;
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  background: var(--sa-color-surface-base);
+  font-size: var(--sa-type-xs);
+  overflow-wrap: anywhere;
+}
+
+.cons-theme__remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  min-height: 24px;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--sa-color-ink-secondary);
+  cursor: pointer;
+}
+
+.cons-theme__remove:hover {
+  color: var(--sa-color-ink-primary);
+}
+
+.cons-theme__remove:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cons-notelist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+}
+
+.cons-note {
+  padding: var(--sa-space-2);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  background: var(--sa-color-surface-base);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+  min-width: 0;
+}
+
+.cons-note__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-2);
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.cons-note__text {
+  font-size: var(--sa-type-sm);
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.cons-note__withheld {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  font-style: italic;
+}
+
+/* --- Case picker (Tele-MANAS) --------------------------------------------- */
+.cons-picker {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.cons-picker__legend {
+  font-size: var(--sa-type-sm);
+  font-weight: 600;
+  padding: 0;
+  margin-bottom: var(--sa-space-1);
+}
+
+.cons-picker__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+.cons-picker__opt {
+  display: flex;
+  align-items: center;
+  gap: var(--sa-space-2);
+  min-height: 48px;
+  padding: var(--sa-space-1) var(--sa-space-2);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  background: var(--sa-color-surface-raised);
+  cursor: pointer;
+  font-size: var(--sa-type-xs);
+}
+
+.cons-picker__opt:hover {
+  border-color: var(--sa-color-brand-olive);
+}
+
+.cons-picker__opt:has(.cons-picker__input:focus-visible) {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cons-picker__opt:has(.cons-picker__input:checked) {
+  border-color: var(--sa-color-brand-olive);
+  background: var(--sa-color-brand-olive-soft);
+}
+
+.cons-picker__input {
+  width: 20px;
+  height: 20px;
+  accent-color: var(--sa-color-brand-olive);
+  flex: none;
+}
+
+.cons-picker__label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sa-space-1);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* --- Identity (post-unmask) ----------------------------------------------- */
+.cons-identity {
+  font-size: var(--sa-type-sm);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cons-identity__expiry {
+  font-size: var(--sa-type-xs);
+  font-weight: 400;
+  color: var(--sa-color-ink-secondary);
+}

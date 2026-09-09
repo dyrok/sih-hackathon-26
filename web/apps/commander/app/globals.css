@@ -1,0 +1,839 @@
+/* Commander dashboard styles.
+   Colour comes only from @saarthi/tokens CSS vars; spacing only from
+   --sa-space-1|2|3 (4 / 16 / 36) and whole multiples of them; type only from
+   the 12/16/21/27/35 scale. Nothing in this file states a colour of its own. */
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--sa-color-surface-base);
+  color: var(--sa-color-ink-primary);
+  font-family: var(--sa-font-sans);
+  font-size: var(--sa-type-sm);
+  line-height: var(--sa-line-height);
+}
+
+/* Devanagari needs the extra leading, and no text box may be fixed-height. */
+[data-locale="hi"] body {
+  line-height: var(--sa-line-height-hi);
+}
+
+/* --- Screen scaffolding ---------------------------------------------------- */
+
+.cmd-screen {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+  min-width: 0;
+}
+
+.cmd-topline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sa-space-2);
+  margin-bottom: var(--sa-space-2);
+}
+
+/* Hook → bridge → detail, and never a fourth level (design.md §3). */
+.cmd-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sa-space-2);
+}
+
+.cmd-head__text {
+  min-width: 0;
+  max-width: 72ch;
+}
+
+.cmd-head__title {
+  font-size: var(--sa-type-lg);
+  font-weight: 700;
+  margin: 0;
+  color: var(--sa-color-ink-primary);
+}
+
+.cmd-head__guide {
+  font-size: var(--sa-type-sm);
+  color: var(--sa-color-ink-secondary);
+  margin: var(--sa-space-1) 0 0;
+}
+
+.cmd-head__aside {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--sa-space-1) * 2);
+  flex-wrap: wrap;
+}
+
+.cmd-unitid {
+  font-size: var(--sa-type-xs);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--sa-color-brand-olive);
+  background: var(--sa-color-brand-olive-soft);
+  border-radius: 999px;
+  padding: calc(var(--sa-space-1) * 1) calc(var(--sa-space-1) * 3);
+}
+
+.cmd-h2 {
+  font-size: var(--sa-type-md);
+  font-weight: 700;
+  margin: 0 0 var(--sa-space-2);
+  color: var(--sa-color-ink-primary);
+}
+
+.cmd-note {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  margin: 0;
+  max-width: 72ch;
+}
+
+.cmd-asof {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.cmd-asof--stale {
+  font-style: italic;
+}
+
+.cmd-panel {
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  padding: var(--sa-space-2);
+  min-width: 0;
+}
+
+.cmd-panel--dial {
+  display: flex;
+  justify-content: center;
+}
+
+.cmd-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+}
+
+/* --- Reconnect banner ------------------------------------------------------ */
+
+.cmd-banner {
+  display: flex;
+  align-items: center;
+  gap: var(--sa-space-2);
+  flex-wrap: wrap;
+  padding: calc(var(--sa-space-1) * 3);
+  border: 1px solid var(--sa-color-focus);
+  border-radius: 12px;
+  background: var(--sa-color-surface-raised);
+}
+
+.cmd-banner__icon {
+  color: var(--sa-color-focus);
+  flex: none;
+}
+
+.cmd-banner__text {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-primary);
+  flex: 1 1 20ch;
+}
+
+/* --- Heatmap grid ---------------------------------------------------------- */
+
+.cmd-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--sa-space-2);
+}
+
+.cmd-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: calc(var(--sa-space-1) * 2);
+  min-height: 120px;
+  padding: var(--sa-space-2);
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-inline-start-width: 4px;
+  border-radius: 12px;
+  color: var(--sa-color-ink-primary);
+  text-decoration: none;
+}
+
+.cmd-cell--link {
+  transition: transform 120ms ease-out, background-color 120ms ease-out;
+}
+
+.cmd-cell--link:hover {
+  background: var(--sa-color-surface-base);
+  transform: translateY(-1px);
+}
+
+.cmd-cell--link:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+/* The ladder tints the edge only; the chip and the label carry the meaning. */
+.cmd-cell--green {
+  border-inline-start-color: var(--sa-color-state-green);
+}
+.cmd-cell--amber {
+  border-inline-start-color: var(--sa-color-state-amber);
+}
+.cmd-cell--red {
+  border-inline-start-color: var(--sa-color-state-red);
+}
+.cmd-cell--critical {
+  border-inline-start-color: var(--sa-color-state-critical);
+}
+
+/* Suppressed cells get no tint at all — a shade would imply a value. */
+.cmd-cell--suppressed,
+.cmd-cell--loading {
+  border-inline-start-color: var(--sa-color-brand-olive-soft);
+  justify-content: center;
+}
+
+.cmd-cell__label {
+  font-size: var(--sa-type-md);
+  font-weight: 600;
+  line-height: var(--sa-line-height);
+}
+
+.cmd-cell__unit {
+  font-size: var(--sa-type-sm);
+  font-weight: 600;
+  margin: 0;
+}
+
+.cmd-cell__quiet {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+}
+
+.cmd-cell__bar {
+  display: block;
+  width: 100%;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--sa-color-brand-olive-soft);
+  overflow: hidden;
+}
+
+.cmd-cell__barfill {
+  display: block;
+  height: 100%;
+  background: var(--sa-color-brand-olive);
+}
+
+.cmd-legend {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: calc(var(--sa-space-1) * 2);
+}
+
+/* --- Column layouts -------------------------------------------------------- */
+
+.cmd-cols {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--sa-space-2);
+  align-items: start;
+}
+
+.cmd-cols--two {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.cmd-cols--three {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.cmd-cols--four {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+/* Tiles in a row share a baseline whatever their value's height. */
+.cmd-cols--three,
+.cmd-cols--four {
+  align-items: stretch;
+}
+
+.cmd-cols--three > li,
+.cmd-cols--four > li {
+  display: flex;
+  min-width: 0;
+}
+
+.cmd-cols--three > li > *,
+.cmd-cols--four > li > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.cmd-col {
+  background: var(--sa-color-surface-raised);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  padding: var(--sa-space-2);
+  min-width: 0;
+}
+
+.cmd-col__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+}
+
+/* --- Indicators ------------------------------------------------------------ */
+
+.cmd-indicator {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--sa-space-1) * 2);
+}
+
+.cmd-counts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+.cmd-counts__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sa-space-2);
+  font-size: var(--sa-type-xs);
+}
+
+.cmd-counts__label {
+  color: var(--sa-color-ink-secondary);
+}
+
+.cmd-counts__value {
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.cmd-buckets {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+/* --- Expanders ------------------------------------------------------------- */
+
+.cmd-details {
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 12px;
+  background: var(--sa-color-surface-raised);
+  padding: calc(var(--sa-space-1) * 2);
+}
+
+.cmd-details__summary {
+  cursor: pointer;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  gap: calc(var(--sa-space-1) * 2);
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-brand-olive);
+  padding: 0 var(--sa-space-1);
+  list-style: none;
+}
+
+/* Changing `display` drops the native disclosure triangle, so the affordance is
+   drawn here instead — a CSS chevron, no glyph and therefore nothing to
+   translate. */
+.cmd-details__summary::-webkit-details-marker {
+  display: none;
+}
+
+.cmd-details__summary::after {
+  content: "";
+  flex: none;
+  margin-inline-start: auto;
+  width: 8px;
+  height: 8px;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transform: rotate(45deg) translate(-2px, -2px);
+  transition: transform 120ms ease-out;
+}
+
+.cmd-details[open] > .cmd-details__summary::after {
+  transform: rotate(-135deg) translate(-2px, -2px);
+}
+
+.cmd-details__summary:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cmd-details__summary--tile {
+  color: var(--sa-color-ink-primary);
+  font-weight: 400;
+}
+
+.cmd-details__body {
+  padding: var(--sa-space-1) var(--sa-space-1) 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+.cmd-facets {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+}
+
+.cmd-facets__item {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-brand-olive);
+  background: var(--sa-color-brand-olive-soft);
+  border-radius: 999px;
+  padding: var(--sa-space-1) calc(var(--sa-space-1) * 2);
+}
+
+/* --- Rule deltas ----------------------------------------------------------- */
+
+.cmd-rules {
+  margin-top: var(--sa-space-2);
+}
+
+.cmd-rules__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+.cmd-rules__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sa-space-2);
+  padding: var(--sa-space-1) 0;
+  border-bottom: 1px solid var(--sa-color-brand-olive-soft);
+  font-size: var(--sa-type-xs);
+}
+
+.cmd-rules__row:last-child {
+  border-bottom: none;
+}
+
+.cmd-rules__id {
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.cmd-rules__pair,
+.cmd-rules__change {
+  font-variant-numeric: tabular-nums;
+  color: var(--sa-color-ink-secondary);
+}
+
+.cmd-rules__change {
+  font-weight: 700;
+  color: var(--sa-color-ink-primary);
+}
+
+/* --- Assumptions ----------------------------------------------------------- */
+
+.cmd-assume {
+  margin: var(--sa-space-1) 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+}
+
+.cmd-assume__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-2);
+  align-items: baseline;
+  border-bottom: 1px solid var(--sa-color-brand-olive-soft);
+  padding-bottom: var(--sa-space-1);
+}
+
+.cmd-assume__key {
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-ink-secondary);
+  overflow-wrap: anywhere;
+  flex: 0 1 24ch;
+}
+
+.cmd-assume__val {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+  overflow-wrap: anywhere;
+  flex: 1 1 24ch;
+  min-width: 0;
+}
+
+.cmd-assume__pre {
+  margin: 0;
+  /* Complete, but bounded: the snapshot must be readable in full without
+     pushing the projection it explains off the screen. */
+  max-height: 240px;
+  overflow: auto;
+  font-size: var(--sa-type-xs);
+  line-height: var(--sa-line-height);
+  background: var(--sa-color-surface-base);
+  border-radius: 8px;
+  padding: calc(var(--sa-space-1) * 2);
+}
+
+/* --- Simulator ------------------------------------------------------------- */
+
+.cmd-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+}
+
+.cmd-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--sa-space-2);
+}
+
+.cmd-headline {
+  font-size: var(--sa-type-md);
+  font-weight: 700;
+  margin: 0 0 var(--sa-space-1);
+  max-width: 72ch;
+}
+
+.cmd-subline {
+  font-size: var(--sa-type-sm);
+  color: var(--sa-color-ink-secondary);
+  margin: 0 0 var(--sa-space-2);
+  font-variant-numeric: tabular-nums;
+}
+
+/* The server's own words, verbatim — the input is never clamped silently. */
+.cmd-outofrange {
+  margin: 0 0 var(--sa-space-2);
+  padding: calc(var(--sa-space-1) * 3);
+  border: 1px solid var(--sa-color-state-amber);
+  border-radius: 12px;
+  background: var(--sa-color-surface-base);
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-primary);
+  overflow-wrap: anywhere;
+}
+
+/* --- Forecast -------------------------------------------------------------- */
+
+.cmd-horizon {
+  border: none;
+  margin: 0;
+  padding: 0;
+  min-width: 0;
+}
+
+.cmd-horizon__legend {
+  padding: 0;
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-ink-secondary);
+  margin-bottom: var(--sa-space-1);
+}
+
+.cmd-horizon__opts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+}
+
+.cmd-horizon__opt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  min-height: 48px;
+  padding: 0 calc(var(--sa-space-1) * 3);
+  border: 1px solid var(--sa-color-brand-olive-soft);
+  border-radius: 999px;
+  background: var(--sa-color-surface-raised);
+  color: var(--sa-color-ink-secondary);
+  font-size: var(--sa-type-sm);
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+}
+
+.cmd-horizon__opt--on {
+  border-color: var(--sa-color-brand-olive);
+  background: var(--sa-color-brand-olive-soft);
+  color: var(--sa-color-brand-olive);
+  font-weight: 700;
+}
+
+.cmd-horizon__opt:has(.cmd-horizon__input:focus-visible) {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cmd-horizon__input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+
+.cmd-chart {
+  overflow-x: auto;
+  padding: var(--sa-space-1) 0;
+}
+
+.cmd-chart__axis {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--sa-space-2);
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.cmd-stats {
+  margin: var(--sa-space-2) 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-3);
+}
+
+.cmd-stats__row {
+  min-width: 0;
+}
+
+.cmd-stats__key {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+}
+
+.cmd-stats__val {
+  margin: var(--sa-space-1) 0 0;
+  font-size: var(--sa-type-lg);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  display: flex;
+  align-items: baseline;
+  gap: calc(var(--sa-space-1) * 2);
+}
+
+.cmd-stats__delta {
+  font-size: var(--sa-type-sm);
+  font-weight: 600;
+  color: var(--sa-color-ink-secondary);
+}
+
+/* --- Unit picker ----------------------------------------------------------- */
+
+.cmd-picker {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--sa-space-1) * 2);
+  flex-wrap: wrap;
+}
+
+.cmd-picker__label {
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-ink-secondary);
+}
+
+.cmd-picker__select {
+  min-width: 12ch;
+  width: auto;
+}
+
+/* --- Own check-in ---------------------------------------------------------- */
+
+.cmd-checkin {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-1);
+  max-width: 480px;
+}
+
+.cmd-emoji {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sa-space-1);
+  margin-bottom: var(--sa-space-2);
+}
+
+.cmd-emoji__btn {
+  flex: 1 1 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sa-space-1);
+  min-height: 72px;
+  padding: calc(var(--sa-space-1) * 2) var(--sa-space-1);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: var(--sa-color-surface-base);
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.cmd-emoji__btn--on {
+  border-color: var(--sa-color-brand-olive);
+  background: var(--sa-color-brand-olive-soft);
+}
+
+.cmd-emoji__btn:focus-visible {
+  outline: 2px solid var(--sa-color-focus);
+  outline-offset: 2px;
+}
+
+.cmd-emoji__face {
+  font-size: var(--sa-type-md);
+  line-height: var(--sa-line-height);
+}
+
+.cmd-emoji__label {
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+  text-align: center;
+}
+
+/* --- The firewall line ----------------------------------------------------- */
+
+.cmd-firewall {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--sa-space-1) * 3);
+  margin-top: var(--sa-space-3);
+  padding-top: var(--sa-space-2);
+  border-top: 1px solid var(--sa-color-brand-olive-soft);
+  max-width: 72ch;
+}
+
+.cmd-firewall__icon {
+  color: var(--sa-color-brand-olive);
+  flex: none;
+}
+
+.cmd-firewall__text {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-secondary);
+}
+
+/* --- Login ----------------------------------------------------------------- */
+
+.cmd-login {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--sa-space-1);
+  width: min(100%, 420px);
+  margin: 0 auto;
+  padding: var(--sa-space-3) var(--sa-space-2);
+}
+
+.cmd-login__lang {
+  margin-bottom: var(--sa-space-2);
+}
+
+.cmd-login__title {
+  font-size: var(--sa-type-xl);
+  font-weight: 700;
+  color: var(--sa-color-brand-olive);
+  margin: 0;
+}
+
+.cmd-login__sub {
+  font-size: var(--sa-type-sm);
+  color: var(--sa-color-ink-secondary);
+  margin: 0 0 var(--sa-space-2);
+}
+
+.cmd-login__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sa-space-2);
+}
+
+.cmd-login__label {
+  display: block;
+  font-size: var(--sa-type-xs);
+  font-weight: 600;
+  color: var(--sa-color-ink-secondary);
+  margin-bottom: var(--sa-space-1);
+}
+
+.cmd-login__error {
+  margin: 0;
+  font-size: var(--sa-type-xs);
+  color: var(--sa-color-ink-primary);
+  border-inline-start: 4px solid var(--sa-color-state-amber);
+  padding-inline-start: calc(var(--sa-space-1) * 3);
+}
+
+/* A tile whose only content is a suppressed or absent number keeps its label and
+   drops the empty value line, so the detail below it reads as the answer. */
+.cmd-indicator .sa-stat__value:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cmd-cell--link {
+    transition: none;
+  }
+  .cmd-cell--link:hover {
+    transform: none;
+  }
+  .cmd-details__summary::after {
+    transition: none;
+  }
+}

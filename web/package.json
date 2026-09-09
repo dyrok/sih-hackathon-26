@@ -2,16 +2,26 @@
   "name": "saarthi-web",
   "private": true,
   "version": "0.1.0",
-  "description": "SAARTHI client apps — Next.js web monorepo (jawan PWA, counsellor console, commander dashboard)",
-  "workspaces": ["apps/*", "packages/*"],
+  "description": "SAARTHI client apps \u2014 Next.js web monorepo (jawan PWA, counsellor console, commander dashboard)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev:jawan": "bun run --cwd apps/jawan dev",
     "dev:counsellor": "bun run --cwd apps/counsellor dev",
     "dev:commander": "bun run --cwd apps/commander dev",
     "build": "bun run --filter './apps/*' build",
-    "lint": "bun run --filter './apps/*' lint"
+    "lint": "bun run --filter './apps/*' lint",
+    "lint:boundaries": "bun scripts/lint-boundaries.mjs",
+    "typecheck": "bun run --filter './apps/*' typecheck",
+    "test": "bun test",
+    "check": "bun run lint:boundaries && bun run typecheck && bun test && bun run build",
+    "e2e": "bun e2e/smoke.mjs"
   },
   "devDependencies": {
+    "fake-indexeddb": "6.0.0",
+    "playwright-core": "1.56.0",
     "typescript": "^5.9.2"
   }
 }
