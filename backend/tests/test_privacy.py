@@ -10,15 +10,38 @@ from tests.conftest import auth_header
 
 
 def test_k_anonymity_3bn_ok(client):
+    """The commander projection is the elevated share and nothing else.
+
+    It carries no per-tier frequency table at all: a table with one small cell
+    is recoverable by subtraction as soon as the reader knows the unit's
+    strength, and a commander always does (TC-451).
+    """
     h = auth_header(client, "commander.3bn")
     r = client.get("/aggregates/unit/3BN", headers=h)
     assert r.status_code == 200
     data = r.json()
     assert data["k"] == 5
+    assert "cells" not in data
     assert data["n"] is None or data["n"] >= 5
+    if data["elevated_share"] is not None:
+        n = data["n"]
+        elevated = round(data["elevated_share"] * n)
+        assert elevated >= 5 and (n - elevated) >= 5
+
+
+def test_counsellor_tier_table_is_all_or_nothing(client):
+    """The detailed projection exists for the roles that work cases. Its table
+    ships whole or not at all: three published tiers beside one hidden tier
+    hands the hidden one back by subtraction."""
+    r = client.get("/aggregates/unit/3BN", headers=auth_header(client, "counsellor.a"))
+    assert r.status_code == 200
+    data = r.json()
+    assert "cells" in data
+    hidden = [name for name, c in data["cells"].items() if c["suppressed"]]
+    assert len(hidden) in (0, len(data["cells"])), hidden
     for cell in data["cells"].values():
         if not cell["suppressed"]:
-            assert cell["n"] is None or cell["n"] == 0 or cell["n"] >= 5
+            assert cell["n"] == 0 or cell["n"] >= 5
 
 
 def test_k_anonymity_tiny_unit_suppressed(client):
