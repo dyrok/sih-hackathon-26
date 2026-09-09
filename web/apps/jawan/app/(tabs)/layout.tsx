@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useT } from "@saarthi/i18n";
-import { BottomTabs, IconClipboard, IconHeart, IconUser, SyncPill } from "@saarthi/ui";
+import { BottomTabs, IconClipboard, IconHeart, IconUser, SkipLink, SyncPill } from "@saarthi/ui";
 import type { TabItem } from "@saarthi/ui";
-import { API_BASE, getToken } from "@saarthi/api";
-import { startSyncEngine } from "@saarthi/sync";
+import { getToken } from "@saarthi/api";
+import { ensureSyncEngine, stopSyncEngine } from "../lib/sync";
 
 const TABS: TabItem[] = [
   { id: "roster", labelKey: "nav.roster", icon: IconClipboard },
@@ -20,7 +20,6 @@ export default function TabsLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const [authed, setAuthed] = useState<boolean | null>(null);
-  const engineRef = useRef<ReturnType<typeof startSyncEngine> | null>(null);
 
   useEffect(() => {
     if (!getToken()) {
@@ -32,30 +31,30 @@ export default function TabsLayout({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!getToken()) return;
-    engineRef.current = startSyncEngine({
-      apiBase: API_BASE,
-      getToken,
-      endpoints: {
-        checkin: "/app/checkins",
-        instrument: "/app/instruments",
-        consent: "/app/consent",
-        pulse: "/app/pulse/ratings",
-      },
-    });
-    return () => engineRef.current?.stop();
+    // One engine for the whole session. It drains opportunistically; nothing on
+    // screen ever waits for it (ADR-0005).
+    ensureSyncEngine();
+    return () => stopSyncEngine();
   }, []);
 
   if (authed === null) return null;
 
-  const active = pathname.startsWith("/welfare") ? "welfare" : pathname.startsWith("/me") ? "me" : "roster";
+  const active = pathname.startsWith("/welfare")
+    ? "welfare"
+    : pathname.startsWith("/me")
+      ? "me"
+      : "roster";
 
   return (
     <div className="app-shell">
+      <SkipLink targetId="content" />
       <header className="app-topbar">
         <span className="app-brand">{t("login.title")}</span>
         <SyncPill />
       </header>
-      <main className="app-main">{children}</main>
+      <main className="app-main" id="content" tabIndex={-1}>
+        {children}
+      </main>
       <BottomTabs tabs={TABS} active={active} onSelect={(id) => router.push(`/${id}`)} />
     </div>
   );

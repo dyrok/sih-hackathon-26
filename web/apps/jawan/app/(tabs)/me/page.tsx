@@ -1,32 +1,38 @@
 "use client";
 
+import Link from "next/link";
 import { useT } from "@saarthi/i18n";
-import { IconGlobe, IconShield, IconUser } from "@saarthi/ui";
+import { IconClock, IconFileText, IconShield, IconSliders } from "@saarthi/ui";
 
-const ITEMS = [
-  { key: "me.consent", icon: IconShield },
-  { key: "me.receipts", icon: IconUser },
-  { key: "me.settings", icon: IconGlobe },
-] as const;
+const ROWS = [
+  { href: "/me/consent", labelKey: "me.consent", detailKey: "consent.subtitle", icon: IconShield },
+  { href: "/me/receipts", labelKey: "me.receipts", detailKey: "whoViewed.footer", icon: IconFileText },
+  { href: "/me/signals", labelKey: "me.signals", detailKey: "signals.noAudio", icon: IconClock },
+  { href: "/me/settings", labelKey: "me.settings", detailKey: "settings.helpline", icon: IconSliders },
+];
 
 export default function MePage() {
   const { t } = useT();
   return (
     <>
-      <h1 className="section-title" style={{ marginTop: 0 }}>
-        {t("nav.me")}
-      </h1>
-      {ITEMS.map(({ key, icon: Icon }) => (
-        <div className="list-row" key={key}>
-          <span className="list-row__label">
-            <span className="list-row__icon">
-              <Icon width={22} height={22} />
-            </span>
-            {t(key)}
-          </span>
-          <span className="sa-syncpill">{t("coming.soon")}</span>
-        </div>
-      ))}
+      <h1 className="section-title section-title--first">{t("me.title")}</h1>
+      <p className="screen-lead">{t("receipt.header")}</p>
+
+      <ul className="hub-list">
+        {ROWS.map(({ href, labelKey, detailKey, icon: Icon }) => (
+          <li key={href}>
+            <Link className="hub-row" href={href}>
+              <span className="hub-row__icon">
+                <Icon width={22} height={22} />
+              </span>
+              <span className="hub-row__text">
+                <span className="hub-row__label">{t(labelKey)}</span>
+                <span className="hub-row__detail">{t(detailKey)}</span>
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </>
   );
 }

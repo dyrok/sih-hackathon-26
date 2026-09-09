@@ -6,7 +6,8 @@
     "dev": "next dev --port 3100",
     "build": "next build",
     "start": "next start --port 3100",
-    "lint": "next lint"
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "next": "15.3.3",
@@ -18,7 +19,8 @@
     "@saarthi/i18n": "workspace:*",
     "@saarthi/ui": "workspace:*",
     "@saarthi/sync": "workspace:*",
-    "@saarthi/api": "workspace:*"
+    "@saarthi/api": "workspace:*",
+    "@saarthi/instruments": "workspace:*"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

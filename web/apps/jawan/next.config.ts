@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     "@saarthi/ui",
     "@saarthi/sync",
     "@saarthi/api",
+    "@saarthi/instruments",
   ],
 };
 

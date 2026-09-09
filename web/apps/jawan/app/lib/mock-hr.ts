@@ -1,18 +1,28 @@
 /**
- * MOCK HR data for the demo persona (Constable 34, 3rd Bn).
- * APP-002 adapter: kv's backend does not expose HRMS proxy endpoints yet.
- * These values stand in behind the same shape the real adapter will use —
- * swap the implementation, not the screen.
+ * OFFLINE / DEGRADED FALLBACK ONLY.
+ *
+ * The roster home reads the real HR proxies — `getRoster()`, `getLeave()`,
+ * `getPayslip()` from `@saarthi/api/jawan` — and caches each response in
+ * IndexedDB so an offline open still shows the person's own duty, leave and
+ * pay-slip month. These constants stand in for exactly one case: a first run
+ * that has never reached the server and therefore has nothing cached. The
+ * screen says so with `roster.demoNote` whenever they are on screen.
+ *
+ * Nothing here is welfare data, and nothing here is ever written back.
  */
 
 export type MockHr = {
-  nextDuty: string;
+  nextDutyDate: string;
+  nextDutyShift: string;
   leaveBalance: number;
+  leaveEntitlement: number;
   payslipMonth: string;
 };
 
 export const mockHr: MockHr = {
-  nextDuty: "Tue 09 Sep · 06:00 gate duty",
+  nextDutyDate: "2026-09-09",
+  nextDutyShift: "day",
   leaveBalance: 12,
-  payslipMonth: "Aug 2026",
+  leaveEntitlement: 30,
+  payslipMonth: "2026-08",
 };

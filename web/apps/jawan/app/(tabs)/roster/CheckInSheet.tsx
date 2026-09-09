@@ -1,51 +1,61 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useT } from "@saarthi/i18n";
-import { Button } from "@saarthi/ui";
-import { enqueue, getClientUuid, notifyQueueChanged } from "@saarthi/sync";
-import type { QueueItem } from "@saarthi/sync";
-import { grantConsent, toCheckInWire } from "@saarthi/api";
+import { Button, Checkbox, Field, Sheet, Slider, TextArea, TextInput, useApi } from "@saarthi/ui";
+import { enqueue, newItemUuid, notifyQueueChanged } from "@saarthi/sync";
+import { getConsent, grantConsent, toCheckInWire } from "@saarthi/api/jawan";
+import type { ConsentWire } from "@saarthi/api/jawan";
+import { CACHE } from "../../lib/cache";
+import { localDate } from "../../lib/format";
+import { VoiceCapture } from "../../components/VoiceCapture";
 
-const EMOJI = ["😞", "😕", "😐", "🙂", "😄"] as const;
+const EMOJI = ["\u{1F61E}", "\u{1F615}", "\u{1F610}", "\u{1F642}", "\u{1F604}"] as const;
+/** Offline memory of a grant that is still sitting in the outbox. */
 const CONSENTED_KEY = "saarthi.consented.checkin";
 
 type Props = {
   onClose: () => void;
-  onSaved: () => void;
+  /** The queue row id, so the caller can offer an undo instead of a confirm. */
+  onSaved: (queueId: number) => void;
 };
 
+function localFlag(key: string): boolean {
+  try {
+    return localStorage.getItem(key) === "1";
+  } catch {
+    return false;
+  }
+}
+
 /**
- * 10-second check-in sheet (F02): ≤3 taps — emoji → slider → save.
- * Writes to the local queue instantly; the network is never required (ADR-0005).
- * First save grants the checkin consent bundle explicitly (checkbox) — consent
- * is never granted silently.
- * Native <dialog> + showModal() gives focus trap, inert background, Escape,
- * and focus restore on close for free.
+ * The 10-second check-in (F02 screen 2): emoji → save is two taps; everything
+ * else on the sheet is optional. It writes to the local outbox and returns —
+ * the network is never on the path (ADR-0005), and the confirmation is an undo
+ * bar on the home screen rather than a modal asking "are you sure" (design.md
+ * §6: undo beats confirm).
  */
 export function CheckInSheet({ onClose, onSaved }: Props) {
   const { t, locale } = useT();
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const emojiGroupRef = useRef<HTMLDivElement>(null);
   const [mood, setMood] = useState<number | null>(null);
   const [slider, setSlider] = useState(5);
+  const [sleep, setSleep] = useState("");
   const [note, setNote] = useState("");
-  const [agreed, setAgreed] = useState(() => localStorage.getItem(CONSENTED_KEY) === "1");
-  const [error, setError] = useState<string | null>(null);
+  const [agreed, setAgreed] = useState(() => localFlag(CONSENTED_KEY));
+  const [error, setError] = useState<"mood" | "consent" | null>(null);
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    const d = dialogRef.current;
-    if (d && !d.open) d.showModal();
-  }, []);
+  // Cached so the sheet knows the consent state on a cold offline open.
+  const { data: consent } = useApi(getConsent, [], { cacheKey: CACHE.consent });
+  const bundle = (id: string) => consent?.bundles.find((b) => b.bundle_id === id);
+  const checkinGranted = bundle("checkin")?.granted ?? localFlag(CONSENTED_KEY);
+  const voiceGranted = bundle("voice")?.granted ?? false;
 
-  const close = () => {
-    const d = dialogRef.current;
-    if (d && d.open) d.close();
-    onClose();
-  };
-
-  const localDate = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD local
+  const sleepHours = (() => {
+    const value = Number.parseFloat(sleep);
+    return Number.isFinite(value) && value >= 0 && value <= 16 ? value : undefined;
+  })();
 
   const save = async () => {
     if (saving) return;
@@ -54,68 +64,75 @@ export function CheckInSheet({ onClose, onSaved }: Props) {
       emojiGroupRef.current?.querySelector("button")?.focus();
       return;
     }
-    if (!agreed) {
+    if (!checkinGranted && !agreed) {
       setError("consent");
       return;
     }
     setError(null);
     setSaving(true);
     try {
-      const client_uuid = await getClientUuid();
-      const wire = toCheckInWire(mood, slider, localDate);
-
-      // Consent first (kv's API is consent-gated). Online: grant now.
-      // Offline: queue the grant so it syncs before the check-in (FIFO).
-      if (!localStorage.getItem(CONSENTED_KEY)) {
-        const consentWire = {
-          bundle_id: "checkin" as const,
-          purpose_string: t("consent.scope.checkin"),
-          data_categories: ["checkin", "sleep", "instruments"],
+      if (!checkinGranted) {
+        const wire: ConsentWire = {
+          bundle_id: "checkin",
+          purpose_string: t("consent.purpose.checkin"),
+          data_categories: ["mood", "stress_slider", "free_text", "sleep_hours"],
           language: locale,
         };
         try {
-          await grantConsent(consentWire);
+          await grantConsent(wire);
         } catch {
-          await enqueue({ table: "consent", client_uuid, captured_at: new Date().toISOString(), payload: consentWire });
+          // Offline: the grant queues ahead of the check-in, so the server sees
+          // consent before the row it gates (FIFO drain).
+          await enqueue({
+            table: "consent",
+            client_uuid: newItemUuid(),
+            captured_at: new Date().toISOString(),
+            payload: { ...wire },
+          });
         }
-        localStorage.setItem(CONSENTED_KEY, "1");
+        try {
+          localStorage.setItem(CONSENTED_KEY, "1");
+        } catch {
+          /* private mode: the server copy is still authoritative */
+        }
       }
 
-      const item: QueueItem = {
+      const payload = toCheckInWire(mood, slider, localDate(), {
+        ...(sleepHours !== undefined ? { sleep_hours: sleepHours } : {}),
+        ...(note.trim() ? { free_text: note.trim() } : {}),
+      });
+
+      // A fresh uuid PER ITEM. Reusing the device uuid would make the server
+      // treat a second check-in as a retry of the first.
+      const queueId = await enqueue({
         table: "checkin",
-        client_uuid,
+        client_uuid: newItemUuid(),
         captured_at: new Date().toISOString(),
-        payload: {
-          ...wire,
-          ...(note.trim() ? { free_text: note.trim() } : {}),
-        },
-      };
-      await enqueue(item);
+        payload: { ...payload },
+      });
       notifyQueueChanged();
-      onSaved();
+      onSaved(queueId);
     } finally {
       setSaving(false);
     }
   };
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="sheet"
-      aria-labelledby="checkin-sheet-title"
-      onCancel={(e) => {
-        e.preventDefault();
-        close();
-      }}
-      onMouseDown={(e) => {
-        if (e.target === e.currentTarget) close();
-      }}
+    <Sheet
+      titleKey="checkin.title"
+      subtitleKey="screen.disclaimer"
+      onClose={onClose}
+      footer={
+        <>
+          <Button variant="quiet" onClick={onClose}>
+            {t("common.cancel")}
+          </Button>
+          <Button onClick={() => void save()} loading={saving}>
+            {t("checkin.submit")}
+          </Button>
+        </>
+      }
     >
-      <h2 className="sheet__title" id="checkin-sheet-title">
-        {t("checkin.title")}
-      </h2>
-      <p className="sheet__sub">{t("screen.disclaimer")}</p>
-
       <div className="emoji-row" role="group" aria-label={t("checkin.title")} ref={emojiGroupRef}>
         {EMOJI.map((face, i) => {
           const value = i + 1;
@@ -137,66 +154,49 @@ export function CheckInSheet({ onClose, onSaved }: Props) {
           );
         })}
       </div>
-      {error === "mood" && (
+      {error === "mood" ? (
         <p className="sheet__error" role="alert">
           {t("checkin.error.mood")}
         </p>
-      )}
+      ) : null}
 
-      <label className="slider-label" htmlFor="stress-slider">
-        {t("checkin.slider.label")}
-      </label>
-      <div className="slider-row">
-        <input
-          id="stress-slider"
-          className="slider-input"
-          type="range"
+      <Slider labelKey="checkin.slider.label" value={slider} onChange={setSlider} min={0} max={10} />
+
+      <Field labelKey="checkin.sleep.label" htmlFor="checkin-sleep">
+        <TextInput
+          id="checkin-sleep"
+          type="number"
+          inputMode="decimal"
           min={0}
-          max={10}
-          value={slider}
-          onChange={(e) => setSlider(Number(e.target.value))}
+          max={16}
+          step={0.5}
+          value={sleep}
+          onChange={(e) => setSleep(e.target.value)}
         />
-        <span className="slider-value" aria-hidden="true">
-          {slider}
-        </span>
-      </div>
+      </Field>
 
-      <label className="field-label" htmlFor="checkin-note">
-        {t("checkin.optional.label")}
-      </label>
-      <input
-        id="checkin-note"
-        className="field-input"
-        value={note}
-        placeholder={t("checkin.optional.placeholder")}
-        onChange={(e) => setNote(e.target.value)}
-      />
+      <Field labelKey="checkin.optional.label" htmlFor="checkin-note">
+        <TextArea
+          id="checkin-note"
+          rows={3}
+          value={note}
+          placeholder={t("checkin.optional.placeholder")}
+          onChange={(e) => setNote(e.target.value)}
+        />
+      </Field>
+      <VoiceCapture granted={voiceGranted} />
 
-      <label className="consent-check">
-        <input
-          type="checkbox"
+      {!checkinGranted ? (
+        <Checkbox
+          labelKey="consent.checkin.agree"
           checked={agreed}
-          onChange={(e) => {
-            setAgreed(e.target.checked);
-            setError((err) => (err === "consent" ? null : err));
+          errorKey={error === "consent" ? "consent.checkin.error" : undefined}
+          onChange={(next) => {
+            setAgreed(next);
+            setError((e) => (e === "consent" ? null : e));
           }}
         />
-        <span>{t("consent.checkin.agree")}</span>
-      </label>
-      {error === "consent" && (
-        <p className="sheet__error" role="alert">
-          {t("consent.checkin.error")}
-        </p>
-      )}
-
-      <div className="sheet-actions">
-        <Button variant="quiet" onClick={close}>
-          {t("common.cancel")}
-        </Button>
-        <Button onClick={save} loading={saving}>
-          {t("checkin.submit")}
-        </Button>
-      </div>
-    </dialog>
+      ) : null}
+    </Sheet>
   );
 }
