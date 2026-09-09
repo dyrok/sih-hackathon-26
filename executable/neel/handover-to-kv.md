@@ -146,8 +146,7 @@ measures all 18 pairs on every build**, so this cannot drift back.
    (1 commit). Note tejas hand-edited his `checklist.md`, which is generated —
    his statuses need to move into `board.md` or the next
    `sync-checklists.py` run will overwrite them.
-4. **TC-505** is referenced in test-plan.md §2 but defined nowhere. Define it or
-   drop the reference.
+4. **TC-505** — resolved: dropped. FR-20 maps to TC-501…TC-504; no distinct 5th generator case existed in `data/tests`.
 5. **The demo needs `make generate`, not just `make seed`.** With the 12-person
    persona seed, 3BN is correctly suppressed on the commander heatmap and the
    "3rd Bn, 22% elevated fatigue" line never appears. The 1,000-personnel

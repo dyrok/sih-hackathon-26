@@ -21,19 +21,21 @@ typecheck, all three suites and the production build.
 
 | Suite | Command | Tests | Result |
 |---|---|---|---|
-| Backend API + engines | `make test-backend` | 132 | pass |
+| Backend API + engines | `make test-backend` | 138 | pass |
 | Synthetic data generator | `make test-data` | 77 | pass |
 | Web (offline queue, instruments, wire format) | `make test-web` | 48 | pass |
-| **Total** | `make test` | **257** | **pass** |
+| **Total** | `make test` | **263** | **pass** |
+
+Re-verified 2026-09-09 on this machine (system Python 3.9.6; bun 1.4.0): backend 138 passed in 116.64 s, data 77 passed in 15.06 s, web 48 passed in 64 ms, `lint-boundaries.mjs` clean (18 contrast pairs, 495 i18n keys), `bun run typecheck` exit 0 on all three apps, serial `next build` of jawan / commander / counsellor all exit 0. Coverage percentages in §3 are from the original instrumented run, not re-measured.
 
 Backend suites, by file:
 
 | File | Tests | What it holds |
 |---|---|---|
 | `test_rbac_enforcement.py` | 35 | PRIV-002 — every RBAC/ABAC matrix cell, route enumeration per role, token integrity |
-| `test_security_hardening.py` | 30 | PRIV-003 — one regression test per closed security finding |
+| `test_security_hardening.py` | 35 | PRIV-003 — one regression test per closed security finding |
 | `test_privacy_paths.py` | 17 | the refusal, retention and masking branches that only run on a bad day |
-| `test_privacy.py` | 8 | k-anonymity, dual-key, break-glass, silent withdrawal, audit chain, expiry |
+| `test_privacy.py` | 9 | k-anonymity, dual-key, break-glass, silent withdrawal, audit chain, expiry |
 | `test_firewall.py` | 7 | ADR-0003 must-pass gate |
 | `test_risk_pure.py` | 7 | scoring arithmetic, domain caps, hysteresis, masking |
 | `test_signals.py` | 7 | signal derivation against hand-computed values |
@@ -105,11 +107,13 @@ Honest gaps, so nobody reads a green suite as more than it is:
 - **No device lab.** TC-606/TC-607 (API-26-class Android, 200% zoom, 320px
   reflow, screen-reader walkthrough) are manual and unrun. The protocol for them
   is in [usability-testing.md](usability-testing.md).
-- **No browser-level E2E.** The three apps are covered by typecheck, production
-  build, the boundary lint and unit tests over the offline queue, the instrument
-  bank and the wire format — not by a driven browser. The check-in-to-counsellor
-  loop is exercised end to end at the API layer (`test_client_surface.py`), and
-  by hand from the [demo-runbook](demo-runbook.md).
+- **Browser E2E exists but was not re-run on this pickup.** `web/e2e/smoke.mjs`
+  (`make e2e`) drives Chromium across jawan / counsellor / commander (check-in
+  with the network off, outbox drain, receipts, Hindi, 320px reflow, commander
+  DOM has no individual, personnel-lookup trap 403). It needs the API plus all
+  three dev servers. Last recorded green run is in
+  [handover-to-kv.md](../../executable/neel/handover-to-kv.md). This session
+  re-ran unit tests, the boundary lint and typecheck only.
 - **No load test.** TC-701 measures a single-process recompute, not concurrency.
 - **Encryption at rest, TLS termination and key management** are deployment
   concerns, unverified here — see security-model.md's verification status.

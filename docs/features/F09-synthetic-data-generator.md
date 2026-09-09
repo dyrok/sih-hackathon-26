@@ -5,7 +5,7 @@
 
 ## Purpose
 
-"**Where is your data?**" is the first question every judge and every CRPF stakeholder will ask. The PS ships anonymized HR/deployment/wellness datasets, but a live demo needs a working system seeded *today* with realistic Indian data — names, battalions like 3rd Bn, rosters, leave patterns — or we demo an empty dashboard. The generator also feeds the test suite ([TC-501…505](../quality/test-plan.md)) and ayush's model-validation harness (ML-002) with one deterministic fixture, so tests, demos and model evaluation all run on the same data.
+"**Where is your data?**" is the first question every judge and every CRPF stakeholder will ask. The PS ships anonymized HR/deployment/wellness datasets, but a live demo needs a working system seeded *today* with realistic Indian data — names, battalions like 3rd Bn, rosters, leave patterns — or we demo an empty dashboard. The generator also feeds the test suite ([TC-501…TC-504](../quality/test-plan.md)) and ayush's model-validation harness (ML-002) with one deterministic fixture, so tests, demos and model evaluation all run on the same data.
 
 ## Design
 
@@ -98,7 +98,7 @@ Exit non-zero with a readable report on any validation failure (FK violations, k
 ## Definition of done
 
 - [x] All commands in the CLI sketch work; `--dry-run` prints the persona arc table.
-- [ ] TC-501…TC-505 green ([test-plan.md](../quality/test-plan.md) §3, §4); distributions signed off by neel (spec ↔ harness config cross-check). — **TC-501/502/503/504 are green** in `data/tests` (77 tests); TC-505 is not defined anywhere in test-plan.md §3, so it cannot be claimed green (kv: define it or drop the reference).
+- [x] TC-501…TC-504 green ([test-plan.md](../quality/test-plan.md) §3); distributions signed off by neel (spec ↔ harness config cross-check). — 77 tests in `data/tests`. The old `TC-501…TC-505` range had no fifth case: CSV noise is TC-102 (emission rates live under TC-503), k ≥ 5 is TC-504, scale is the TC-501 `--personnel 1000` fixture. TC-505 was dropped rather than invented.
 - [x] Demo seed reproduces the full runbook walkthrough on a clean database ([demo-runbook.md](../quality/demo-runbook.md)). — all 7 beats reproduce. Beat 7 ("score trend drops") was blocked by a rules-engine defect when this section was first written; kv has since fixed it (see Implementation status §5). Re-measured on generator output: score 67 → 45 → 30, tier Red (day 62) → Amber (day 68) → **Green (day 76, held through day 90)**.
 - [x] No welfare table contains real-looking identity data linked to scores outside the unmask path; k ≥ 5 guard proven by a negative test.
 - [ ] README gets the one-command seed snippet (jury "setup in 5 minutes" checklist, research §8). — the repo-root `README.md` is not neel-owned this round; the snippet lives in [`data/README.md`](../../data/README.md) §1 and [demo-runbook.md](../quality/demo-runbook.md) §2 already cites the command.

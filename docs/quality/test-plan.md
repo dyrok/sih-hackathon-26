@@ -42,7 +42,7 @@ ID scheme `TC-<nnn>` by layer: **1xx** signal · **2xx** inference · **3xx** in
 | FR-17 | Silent consent withdrawal | TC-407 |
 | FR-18 | 90-day raw-data expiry | TC-408 |
 | FR-19 | Anonymous unit pulse (aggregate only) | TC-402 |
-| FR-20 | Synthetic data generator | TC-501…TC-505 |
+| FR-20 | Synthetic data generator | TC-501…TC-504 |
 
 | NFR | Requirement (short) | Test cases |
 |---|---|---|

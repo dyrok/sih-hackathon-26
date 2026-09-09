@@ -9,83 +9,57 @@
 
 All 17 of neel's board tasks are **functionally complete and tested**:
 APP-001…010, PRIV-002, PRIV-003, UX-001, UX-002, QA-001, QA-002, QA-003.
-`executable/board.md` rows for neel are `[x]`. Checklists were just regenerated
-via `python3 executable/tools/sync-checklists.py` (ran clean, no `--check`
-errors expected on neel's rows).
+`executable/board.md` rows for neel are `[x]`.
 
-**Everything is on the local `neel` branch, uncommitted.** Nothing has been
-pushed. That is the single most important thing to finish if you are picking
-this up cold.
+**The implementation is committed and pushed to `origin/neel`** (16 commits
+ahead of `origin/main` as of 2026-09-09). The earlier "uncommitted working
+tree" note is stale.
+
+Pickup on 2026-09-09 re-verified:
+
+| Suite | Result |
+|---|---|
+| Backend `python3 -m pytest -q` | **138 passed** in 116.64 s |
+| Data `python3 -m pytest tests -q` | **77 passed** in 15.06 s |
+| Web `bun test` | **48 passed** |
+| `bun scripts/lint-boundaries.mjs` | clean (18 contrast pairs, 495 i18n keys) |
+| `bun run typecheck` | exit 0 × 3 apps |
+| serial `next build` jawan / commander / counsellor | all exit 0 |
+
+Browser E2E (`make e2e`, 34 checks) was **not** re-run — needs API + 3 dev
+servers. Last recorded green run is in `handover-to-kv.md`.
+
+Docs follow-up in this pickup: **TC-505 dropped** (never defined; FR-20 maps
+to TC-501…TC-504). Coverage report totals updated to 263. `handover-to-kv.md`
+§5 item 4 no longer asks kv to define TC-505.
 
 ## Immediate next steps, in order
 
-1. **Verify the suite is green** (it was, as of the last full run — 138 backend
-   tests, 77 data-generator tests, 48 web tests, 34 browser E2E checks):
+1. **Open a PR into `main`** if one does not already exist. Title:
+   `[APP-001] neel: web apps, security hardening, synthetic data, QA-003 coverage`
+   Body should point at `executable/neel/handover-to-kv.md` rather than
+   duplicating it. Compare URL:
+   `https://github.com/dyrok/sih-hackathon-26/compare/main...neel?expand=1`
+   `gh` is installed (`/opt/homebrew/bin/gh`) but **not logged in**; HTTPS
+   git credentials 401 against api.github.com. SSH git push works as `Kv-404`.
+
+2. **Notify kv**: "PR ready for review" per AGENTS.md rule 5. Do not merge
+   it yourself — only kv merges.
+
+3. If you still need to re-verify:
    ```bash
-   cd backend && .venv/bin/python -m pytest -q          # expect all passed
-   cd ../data && ../backend/.venv/bin/python -m pytest tests -q   # 77 passed
-   cd ../web && bun test                                  # 48 passed
-   bun scripts/lint-boundaries.mjs                        # boundaries clean
-   bun run typecheck                                      # exit 0 x3
-   bun run build                                           # 3 apps compile
+   cd backend && python3 -m pytest -q          # 138 passed (system 3.9.6)
+   cd ../data && python3 -m pytest tests -q    # 77 passed
+   cd ../web && bun test                       # 48 passed
+   bun scripts/lint-boundaries.mjs
+   bun run typecheck
+   # serial builds — parallel `bun run build` raced with a second next
+   bun run --cwd apps/jawan build
+   bun run --cwd apps/commander build
+   bun run --cwd apps/counsellor build
    ```
-   If anything regressed, it is almost certainly because another docs-sync
-   background workflow (`wf_b041a18b-ef9`, see below) touched a file
-   concurrently with this session's own edits — re-read the file before
-   assuming your fix is wrong.
-
-2. **Check whether the docs-sync workflow finished.** A background Workflow
-   (run id `wf_b041a18b-ef9`, script at
-   `/private/tmp/claude-501/-Users-ns-code-sih-hackathon-26/00435b4b-834a-4ab3-90d2-2926fe92c44a/scratchpad/docs.js`)
-   was mid-flight, updating: F02, F03, F06, F07, F09, design.md,
-   design-client-apps.md, rbac-matrix.md, security-model.md, test-plan.md,
-   usability-testing.md. If you see a `<task-notification>` for it, read the
-   result before touching any of those files again — verify its claims the way
-   the workflow's own verify-phase agents were instructed to (every fact must
-   trace to a real file/line; no invented statistics; nothing outside the named
-   files touched). If it did NOT finish, either wait for it or finish the sync
-   yourself by hand — the prompt in `docs.js` documents exactly what changed in
-   code that the docs need to catch up to.
-
-3. **Review `git status --porcelain`** before staging. As of last check there
-   were ~147 modified + ~78 untracked paths, all attributable to this session's
-   own work (backend routers/models/tests, all of `web/apps/{jawan,counsellor,
-   commander}`, `web/packages/*`, `data/`, `docs/`, `scripts/`, `Makefile`,
-   `.github/workflows/ci.yml`). Confirm nothing unexpected is in there (no
-   stray `.env`, no other member's untracked work) before `git add`.
-
-4. **Commit.** Suggested shape — several commits by concern, not one giant
-   commit, so kv's review has natural checkpoints. Every commit message must
-   start with a task ID per AGENTS.md rule 4. Rough grouping that matches the
-   work:
-   - `[APP-001] Web-first jawan/counsellor/commander apps + shared @saarthi/* packages`
-   - `[PRIV-002] RBAC/ABAC enforcement test suite (test_rbac_enforcement.py)`
-   - `[PRIV-003] Security hardening: 12 findings fixed + regression tests`
-   - `[QA-001] Synthetic data generator (data/) — 1000 personnel, 90 days, deterministic`
-   - `[QA-003] Coverage report, perf gate (scripts/perf.py), browser E2E (web/e2e)`
-   - `[UX-001] Contrast fixes (state-ink/focus/saffron-ink tokens) + lint enforcement`
-   - `[UX-002] Design canvas mockups (docs/architecture/design/mockups/)`
-   - docs-sync commit(s) once the workflow above is confirmed done and verified
-   - `Ops: Makefile, CI workflow, .gitignore`
-
-   Do **not** amend or squash — AGENTS.md and the base instructions both say
-   create new commits, never amend published work.
-
-5. **Push** `neel` to `origin/neel`:
-   ```bash
-   git push origin neel
-   ```
-   This branch is 27+ commits ahead of `origin/neel` already (pre-existing,
-   from before this session) plus everything new above — a normal fast-forward
-   push, not a force-push. Do not force-push.
-
-6. **Open a PR into `main`**, title starting with the primary task ID (pick the
-   most representative, e.g. `[APP-001] neel: web apps, security hardening,
-   synthetic data, QA-003 coverage`). Body should point at
-   `executable/neel/handover-to-kv.md` rather than duplicating it.
-
-7. **Notify kv**: "PR ready for review" per the repo's branch → notify → merge
-   workflow (AGENTS.md rule 5). Do not merge it yourself — only kv merges.
+   `backend/.venv` may not exist on this machine; system `python3` 3.9.6 ran
+   the suites green. CI uses Python 3.11.
 
 ## Things to NOT do
 

@@ -1,6 +1,6 @@
 # `data/` — SAARTHI synthetic data generator (F09 · QA-001 / QA-002)
 
-> Owner: neel · Spec: [`docs/features/F09-synthetic-data-generator.md`](../docs/features/F09-synthetic-data-generator.md) · Tests: [`docs/quality/test-plan.md`](../docs/quality/test-plan.md) TC-501…TC-505, TC-701
+> Owner: neel · Spec: [`docs/features/F09-synthetic-data-generator.md`](../docs/features/F09-synthetic-data-generator.md) · Tests: [`docs/quality/test-plan.md`](../docs/quality/test-plan.md) TC-501…TC-504, TC-701
 
 **"Where is your data?"** is the first question every jury and every CRPF stakeholder asks.
 This package answers it: one deterministic command produces ~1,000 personnel × 90 days of
