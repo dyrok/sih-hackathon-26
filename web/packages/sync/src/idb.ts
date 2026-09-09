@@ -1,11 +1,13 @@
-/** Minimal IndexedDB promise wrapper — no external deps. */
+/** Minimal IndexedDB promise wrapper — no external deps (a 2 GB phone pays for
+ * every kilobyte of dependency, ADR-0005). */
 
 export const DB_NAME = "saarthi-offline";
-export const DB_VERSION = 1;
+export const DB_VERSION = 2;
 export const STORES = {
-  meta: "meta", // key/value (client_uuid etc.)
+  meta: "meta", // key/value (client_uuid, last drain, cached reads)
   queue: "queue", // outbound sync queue
-  checkIns: "checkIns", // local copies of check-ins (trend cache, later)
+  checkIns: "checkIns", // local echo of own check-ins (offline trend)
+  cache: "cache", // last-known server reads, so an offline open is not blank
 } as const;
 
 let dbPromise: Promise<IDBDatabase> | null = null;
@@ -25,6 +27,7 @@ function open(): Promise<IDBDatabase> {
         const checkIns = db.createObjectStore(STORES.checkIns, { keyPath: "client_uuid" });
         checkIns.createIndex("by_local_date", "local_date");
       }
+      if (!db.objectStoreNames.contains(STORES.cache)) db.createObjectStore(STORES.cache);
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -33,7 +36,11 @@ function open(): Promise<IDBDatabase> {
   return dbPromise;
 }
 
-export function tx<T>(store: string, mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRequest<T>): Promise<T> {
+export function tx<T>(
+  store: string,
+  mode: IDBTransactionMode,
+  fn: (s: IDBObjectStore) => IDBRequest<T>,
+): Promise<T> {
   return open().then(
     (db) =>
       new Promise<T>((resolve, reject) => {
@@ -63,4 +70,9 @@ export function del(store: string, key: IDBValidKey): Promise<undefined> {
 
 export function clearStore(store: string): Promise<undefined> {
   return tx(store, "readwrite", (s) => s.clear() as IDBRequest<undefined>);
+}
+
+/** Wipe every local table. Used by consent withdrawal and "clear this device". */
+export async function clearAll(): Promise<void> {
+  await Promise.all(Object.values(STORES).map((s) => clearStore(s)));
 }

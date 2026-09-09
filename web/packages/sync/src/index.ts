@@ -1,6 +1,20 @@
-export { getClientUuid } from "./clientUuid";
-export { enqueue, peekQueue, queueSize, removeFromQueue } from "./queue";
+export { getClientUuid, newItemUuid } from "./clientUuid";
+export {
+  allQueued,
+  enqueue,
+  markAttempt,
+  peekQueue,
+  purgeQueueForTables,
+  queueSize,
+  removeFromQueue,
+} from "./queue";
 export type { QueueItem, QueueTable } from "./queue";
-export { startSyncEngine, subscribeSync, getSyncSnapshot, notifyQueueChanged } from "./syncEngine";
-export type { SyncSnapshot, SyncState } from "./syncEngine";
-export { clearStore, STORES, DB_NAME } from "./idb";
+export {
+  getSyncSnapshot,
+  notifyQueueChanged,
+  resetSyncEngineForTests,
+  startSyncEngine,
+  subscribeSync,
+} from "./syncEngine";
+export type { ItemResult, SyncSnapshot, SyncState } from "./syncEngine";
+export { clearAll, clearStore, DB_NAME, get, getAll, put, STORES } from "./idb";
