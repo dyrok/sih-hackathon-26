@@ -1,0 +1,139 @@
+{
+  "pages": [
+    {
+      "id": "page-1",
+      "name": "Check-in flow"
+    },
+    {
+      "id": "page-2",
+      "name": "Privacy panel"
+    },
+    {
+      "id": "page-3",
+      "name": "Design notes"
+    }
+  ],
+  "artboards": [
+    {
+      "file": "Home.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-1",
+      "title": "1 \u00b7 Home (EN)"
+    },
+    {
+      "file": "Main.dc.html",
+      "x": 500,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-1",
+      "title": "2 \u00b7 Check-in sheet (EN)"
+    },
+    {
+      "file": "Saved.dc.html",
+      "x": 1000,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-1",
+      "title": "3 \u00b7 Saved + undo (EN)"
+    },
+    {
+      "file": "HomeHi.dc.html",
+      "x": 0,
+      "y": 994,
+      "w": 390,
+      "h": 844,
+      "page": "page-1",
+      "title": "1 \u00b7 Home (HI)"
+    },
+    {
+      "file": "CheckInHi.dc.html",
+      "x": 500,
+      "y": 994,
+      "w": 390,
+      "h": 844,
+      "page": "page-1",
+      "title": "2 \u00b7 Check-in sheet (HI)"
+    },
+    {
+      "file": "SavedHi.dc.html",
+      "x": 1000,
+      "y": 994,
+      "w": 390,
+      "h": 844,
+      "page": "page-1",
+      "title": "3 \u00b7 Saved + undo (HI)"
+    },
+    {
+      "file": "Consent.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-2",
+      "title": "Consent panel (EN)"
+    },
+    {
+      "file": "Receipts.dc.html",
+      "x": 500,
+      "y": 0,
+      "w": 390,
+      "h": 844,
+      "page": "page-2",
+      "title": "Who viewed my data (EN)"
+    },
+    {
+      "file": "ConsentHi.dc.html",
+      "x": 0,
+      "y": 994,
+      "w": 390,
+      "h": 844,
+      "page": "page-2",
+      "title": "Consent panel (HI)"
+    },
+    {
+      "file": "ReceiptsHi.dc.html",
+      "x": 500,
+      "y": 994,
+      "w": 390,
+      "h": 844,
+      "page": "page-2",
+      "title": "Who viewed my data (HI)"
+    },
+    {
+      "file": "Redlines.dc.html",
+      "x": 0,
+      "y": 0,
+      "w": 900,
+      "h": 1180,
+      "page": "page-3",
+      "title": "Design notes"
+    }
+  ],
+  "annotations": [
+    {
+      "id": "note-checkin",
+      "x": 0,
+      "y": -130,
+      "w": 900,
+      "page": "page-1",
+      "text": "The 10-second check-in (F02 screen 2). Three taps: emoji, slider, Save.\nTop row English, bottom row Hindi \u2014 same layout, +0.1 line-height, no fixed-height text box.\nThe sheet artboard has a State lever: idle / picked / error."
+    },
+    {
+      "id": "note-privacy",
+      "x": 0,
+      "y": -130,
+      "w": 900,
+      "page": "page-2",
+      "text": "The privacy panel (F02 screens 5 and 6). Withdrawing is the same tap depth as granting,\nand the receipt is designed as a receipt, not a warning: who, when, why \u2014 no alarm colour."
+    }
+  ],
+  "launch": {
+    "view": "canvas",
+    "page": "page-1"
+  }
+}
